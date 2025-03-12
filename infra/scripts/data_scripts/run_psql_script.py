@@ -2,26 +2,25 @@ from azure.identity import DefaultAzureCredential
 import psycopg2
 from psycopg2 import sql
 
-key_vault_name = "kv_to-be-replaced" # key vault name is not used in this script
-principal_name = "containerAppPrincipalName" # container app is the one to use postgresql DB
-admin_principal_name = "adminAppPrincipalName"
-additional_principal_name = "additionalAppPrincipalName" # this is the one to use the vector store
-user = "managedIdentityName"
-host = "serverName"
-dbname = "postgres"
+key_vault_name = "key_vault_name_place_holder"
+principal_name = "principal_name_place_holder" 
+host_name = "host_name_place_holder"
+principal_name = "principal_name_place_holder"
+admin_principal_name = "admin_principal_name_place_holder"
+additional_principal_name = "additional_principal_name_place_holder"
+user_name = "user_name_place_holder"
+db_name = "postgres"
 
-
-def grant_permissions(cursor, dbname, schema_name, principal_name):
+# Grant Permission Function
+def grant_permissions(cursor, db_name, schema_name, principal_name):
     """
     Grants database and schema-level permissions to a specified principal.
-
     Parameters:
     - cursor: psycopg2 cursor object for database operations.
-    - dbname: Name of the database to grant CONNECT permission.
+    - db_name: Name of the database to grant CONNECT permission.
     - schema_name: Name of the schema to grant table-level permissions.
     - principal_name: Name of the principal (role or user) to grant permissions.
     """
-
     # Check if the principal exists in the database
     cursor.execute(
         sql.SQL("SELECT 1 FROM pg_roles WHERE rolname = {principal}").format(
@@ -42,11 +41,11 @@ def grant_permissions(cursor, dbname, schema_name, principal_name):
     grant_connect_query = sql.SQL("GRANT CONNECT ON DATABASE {database} TO {principal}")
     cursor.execute(
         grant_connect_query.format(
-            database=sql.Identifier(dbname),
+            database=sql.Identifier(db_name),
             principal=sql.Identifier(principal_name),
         )
     )
-    print(f"Granted CONNECT on database '{dbname}' to '{principal_name}'")
+    print(f"Granted CONNECT on database '{db_name}' to '{principal_name}'")
 
     # Grant SELECT, INSERT, UPDATE, DELETE on schema tables
     grant_permissions_query = sql.SQL(
@@ -69,7 +68,7 @@ access_token = cred.get_token("https://ossrdbms-aad.database.windows.net/.defaul
 
 # Combine the token with the connection string to establish the connection.
 conn_string = "host={0} user={1} dbname={2} password={3} sslmode=require".format(
-    host, user, dbname, access_token.token
+    host_name, user_name, db_name, access_token.token
 )
 conn = psycopg2.connect(conn_string)
 cursor = conn.cursor()
@@ -78,8 +77,7 @@ cursor = conn.cursor()
 cursor.execute("DROP TABLE IF EXISTS products")
 conn.commit()
 
-create_cs_sql = """
-
+create_products_sql = """
 CREATE TABLE IF NOT EXISTS products
 (
     id integer,
@@ -90,14 +88,14 @@ CREATE TABLE IF NOT EXISTS products
     product_description text
 );
 """
-cursor.execute(create_cs_sql)
+cursor.execute(create_products_sql)
 conn.commit()
 
 # Drop and recreate the customers table
 cursor.execute("DROP TABLE IF EXISTS customers")
 conn.commit()
 
-create_ms_sql = """
+create_customers_sql = """
 CREATE TABLE customers
 (
     id integer,
@@ -112,15 +110,14 @@ CREATE TABLE customers
     membership character varying(50)
 );
 """
-cursor.execute(create_ms_sql)
+cursor.execute(create_customers_sql)
 conn.commit()
 
-
-# Drop and recreate the messages table
+# Drop and recreate the orders table
 cursor.execute("DROP TABLE IF EXISTS orders")
 conn.commit()
 
-create_ms_sql = """
+create_orders_sql = """
 CREATE TABLE orders
 (
     id integer,
@@ -143,9 +140,8 @@ CREATE TABLE orders
     return_status BOOLEAN DEFAULT FALSE
 );
 """
-cursor.execute(create_ms_sql)
+cursor.execute(create_orders_sql)
 conn.commit()
-
 
 # Add Vector extension
 cursor.execute("CREATE EXTENSION IF NOT EXISTS vector CASCADE;")
@@ -154,7 +150,7 @@ conn.commit()
 cursor.execute("DROP TABLE IF EXISTS vector_store;")
 conn.commit()
 
-table_create_command = """
+create_vs_sql= """
 CREATE TABLE IF NOT EXISTS vector_store(
     id text,
     title text,
@@ -168,29 +164,28 @@ CREATE TABLE IF NOT EXISTS vector_store(
     content_vector public.vector(1536)
 );
 """
-cursor.execute(table_create_command)
+cursor.execute(create_vs_sql)
 conn.commit()
-
 
 cursor.execute(
     "CREATE INDEX vector_store_content_vector_idx ON vector_store USING hnsw (content_vector vector_cosine_ops);"
 )
 conn.commit()
 
-grant_permissions(cursor, dbname, "public", principal_name)
+grant_permissions(cursor, db_name, "public", principal_name)
 conn.commit()
 
-grant_permissions(cursor, dbname, "public", admin_principal_name)
+grant_permissions(cursor, db_name, "public", admin_principal_name)
 conn.commit()
 
 # additional principal name 
 if additional_principal_name:
-    grant_permissions(cursor, dbname, "public", additional_principal_name)
+    grant_permissions(cursor, db_name, "public", additional_principal_name)
     conn.commit()
 
-
-cursor.execute("ALTER TABLE public.conversations OWNER TO azure_pg_admin;")
-cursor.execute("ALTER TABLE public.messages OWNER TO azure_pg_admin;")
+cursor.execute("ALTER TABLE public.products OWNER TO azure_pg_admin;")
+cursor.execute("ALTER TABLE public.customers OWNER TO azure_pg_admin;")
+cursor.execute("ALTER TABLE public.orders OWNER TO azure_pg_admin;")
 cursor.execute("ALTER TABLE public.vector_store OWNER TO azure_pg_admin;")
 conn.commit()
 
