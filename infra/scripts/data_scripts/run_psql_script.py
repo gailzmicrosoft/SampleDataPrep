@@ -2,10 +2,10 @@ from azure.identity import DefaultAzureCredential
 import psycopg2
 from psycopg2 import sql
 
-key_vault_name = "kv_to-be-replaced"
-principal_name = "webAppPrincipalName"
+key_vault_name = "kv_to-be-replaced" # key vault name is not used in this script
+principal_name = "containerAppPrincipalName" # container app is the one to use postgresql DB
 admin_principal_name = "adminAppPrincipalName"
-function_app_principal_name = "functionAppPrincipalName"
+additional_principal_name = "additionalAppPrincipalName" # this is the one to use the vector store
 user = "managedIdentityName"
 host = "serverName"
 dbname = "postgres"
@@ -58,8 +58,11 @@ def grant_permissions(cursor, dbname, schema_name, principal_name):
             principal=sql.Identifier(principal_name),
         )
     )
+# end of grant_permissions function
 
-
+##########################################################################################
+# Program starts here
+##########################################################################################
 # Acquire the access token
 cred = DefaultAzureCredential()
 access_token = cred.get_token("https://ossrdbms-aad.database.windows.net/.default")
@@ -71,37 +74,75 @@ conn_string = "host={0} user={1} dbname={2} password={3} sslmode=require".format
 conn = psycopg2.connect(conn_string)
 cursor = conn.cursor()
 
-# Drop and recreate the conversations table
-cursor.execute("DROP TABLE IF EXISTS conversations")
+# Drop and recreate the products table
+cursor.execute("DROP TABLE IF EXISTS products")
 conn.commit()
 
-create_cs_sql = """CREATE TABLE conversations (
-                    id TEXT PRIMARY KEY,
-                    conversation_id TEXT NOT NULL,
-                    type TEXT NOT NULL,
-                    "createdAt" TEXT,
-                    "updatedAt" TEXT,
-                    user_id TEXT NOT NULL,
-                    title TEXT
-                );"""
+create_cs_sql = """
+
+CREATE TABLE IF NOT EXISTS products
+(
+    id integer,
+    product_name character varying(100),
+    price numeric(10,2) NOT NULL,
+    category character varying(50),
+    brand character varying(50),
+    product_description text
+);
+"""
 cursor.execute(create_cs_sql)
 conn.commit()
 
-# Drop and recreate the messages table
-cursor.execute("DROP TABLE IF EXISTS messages")
+# Drop and recreate the customers table
+cursor.execute("DROP TABLE IF EXISTS customers")
 conn.commit()
 
-create_ms_sql = """CREATE TABLE messages (
-                    id TEXT PRIMARY KEY,
-                    type VARCHAR(50) NOT NULL,
-                    "createdAt" TEXT,
-                    "updatedAt" TEXT,
-                    user_id TEXT NOT NULL,
-                    conversation_id TEXT NOT NULL,
-                    role VARCHAR(50),
-                    content TEXT NOT NULL,
-                    feedback TEXT
-                );"""
+create_ms_sql = """
+CREATE TABLE customers
+(
+    id integer,
+    first_name character varying(50),
+    last_name character varying(50),
+    gender character varying(10),
+    date_of_birth date,
+    age integer,
+    email character varying(100),
+    phone character varying(20),
+    post_address character varying(255),
+    membership character varying(50)
+);
+"""
+cursor.execute(create_ms_sql)
+conn.commit()
+
+
+# Drop and recreate the messages table
+cursor.execute("DROP TABLE IF EXISTS orders")
+conn.commit()
+
+create_ms_sql = """
+CREATE TABLE orders
+(
+    id integer,
+    customer_id integer,
+    customer_first_name character varying(50),
+    customer_last_name character varying(50),
+    customer_gender character varying(10),
+    customer_age integer,
+    customer_email character varying(100),
+    customer_phone character varying(20),
+    order_date date,
+    product_id integer,
+    product_name character varying(100) NOT NULL,
+    quantity integer,
+    unit_price numeric(10,2),
+    total numeric(10,2),
+    category character varying(50),
+    brand character varying(50),
+    product_description text,
+    return_status BOOLEAN DEFAULT FALSE
+);
+"""
 cursor.execute(create_ms_sql)
 conn.commit()
 
@@ -113,7 +154,8 @@ conn.commit()
 cursor.execute("DROP TABLE IF EXISTS vector_store;")
 conn.commit()
 
-table_create_command = """CREATE TABLE IF NOT EXISTS vector_store(
+table_create_command = """
+CREATE TABLE IF NOT EXISTS vector_store(
     id text,
     title text,
     chunk integer,
@@ -124,8 +166,8 @@ table_create_command = """CREATE TABLE IF NOT EXISTS vector_store(
     source text,
     metadata text,
     content_vector public.vector(1536)
-);"""
-
+);
+"""
 cursor.execute(table_create_command)
 conn.commit()
 
@@ -141,8 +183,11 @@ conn.commit()
 grant_permissions(cursor, dbname, "public", admin_principal_name)
 conn.commit()
 
-grant_permissions(cursor, dbname, "public", function_app_principal_name)
-conn.commit()
+# additional principal name 
+if additional_principal_name:
+    grant_permissions(cursor, dbname, "public", additional_principal_name)
+    conn.commit()
+
 
 cursor.execute("ALTER TABLE public.conversations OWNER TO azure_pg_admin;")
 cursor.execute("ALTER TABLE public.messages OWNER TO azure_pg_admin;")
