@@ -3,13 +3,19 @@ import psycopg2
 from psycopg2 import sql
 
 key_vault_name = "key_vault_name_place_holder"
-principal_name = "principal_name_place_holder" 
 host_name = "host_name_place_holder"
-principal_name = "principal_name_place_holder"
 admin_principal_name = "admin_principal_name_place_holder"
-additional_principal_name = "additional_principal_name_place_holder"
-user_name = "user_name_place_holder"
-db_name = "postgres"
+identity_name = "identity_name_place_holder"
+database_name= "database_name_place_holder"
+
+# # resource group: my-bicep-3-12-1-rg example 
+# key_vault_name = "chatbotoz5ptokv"
+# host_name = "chatbotoz5ptopgserver.postgres.database.azure.com"
+# admin_principal_name = "chatbotPsqlAdminUser"
+# identity_name = "chatbotoz5ptorgMid"
+# database_name= "postgres"
+
+
 
 # Grant Permission Function
 def grant_permissions(cursor, db_name, schema_name, principal_name):
@@ -67,8 +73,9 @@ cred = DefaultAzureCredential()
 access_token = cred.get_token("https://ossrdbms-aad.database.windows.net/.default")
 
 # Combine the token with the connection string to establish the connection.
+# The identity name is used as the username in the connection string.
 conn_string = "host={0} user={1} dbname={2} password={3} sslmode=require".format(
-    host_name, user_name, db_name, access_token.token
+    host_name, identity_name, database_name, access_token.token
 )
 conn = psycopg2.connect(conn_string)
 cursor = conn.cursor()
@@ -172,22 +179,23 @@ cursor.execute(
 )
 conn.commit()
 
-grant_permissions(cursor, db_name, "public", principal_name)
-conn.commit()
-
-grant_permissions(cursor, db_name, "public", admin_principal_name)
-conn.commit()
-
-# additional principal name 
-if additional_principal_name:
-    grant_permissions(cursor, db_name, "public", additional_principal_name)
+# Grant permissions to the admin principal if provided
+if admin_principal_name and admin_principal_name.strip():
+    grant_permissions(cursor, database_name, "public", admin_principal_name)
+    conn.commit()
+    
+# Grant permissions to the additional principal if provided
+if identity_name and identity_name.strip():
+    grant_permissions(cursor, database_name, "public", identity_name)
     conn.commit()
 
-cursor.execute("ALTER TABLE public.products OWNER TO azure_pg_admin;")
-cursor.execute("ALTER TABLE public.customers OWNER TO azure_pg_admin;")
-cursor.execute("ALTER TABLE public.orders OWNER TO azure_pg_admin;")
-cursor.execute("ALTER TABLE public.vector_store OWNER TO azure_pg_admin;")
+# Set default privileges for future tables in the public schema
+cursor.execute("""
+    ALTER DEFAULT PRIVILEGES IN SCHEMA public
+    GRANT ALL PRIVILEGES ON TABLES TO azure_pg_admin;
+""")
 conn.commit()
+
 
 cursor.close()
 conn.close()
