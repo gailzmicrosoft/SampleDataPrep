@@ -21,7 +21,7 @@ echo "Script Started"
 publicIp=$(curl -s https://api.ipify.org)
 
 # Use Azure CLI to add the public IP to the PostgreSQL firewall rule
-az postgres flexible-server firewall-rule create --resource-group $resourceGroup --name $postgres_server_name --rule-name "AllowScriptIp" --start-ip-address "$publicIp" --end-ip-address "$publicIp"
+#az postgres flexible-server firewall-rule create --resource-group $resourceGroup --name $postgres_server_name --rule-name "AllowScriptIp" --start-ip-address "$publicIp" --end-ip-address "$publicIp"
 
 curl --output "run_psql_script.py" ${baseUrl}"scripts/data_scripts/run_psql_script.py"
 
@@ -37,15 +37,40 @@ sed -i "s/database_name_place_holder/${database_name}/g" "run_psql_script.py"
 sed -i "s/admin_principal_name_place_holder/${admin_principal_name}/g" "run_psql_script.py"
 sed -i "s/identity_name_place_holder/${identity_name}/g" "run_psql_script.py"
 
-# Create a virtual environment
-python -m venv myvenv
-source myvenv/bin/activate
+
+# # Create a virtual environment
+# python3 -m venv myvenv
+
+# # Check if the virtual environment was created successfully
+# if [ -d "myvenv" ]; then
+#     echo "Virtual environment created successfully"
+# else
+#     echo "Failed to create virtual environment"
+#     exit 1
+# fi
+
+# # Activate the virtual environment
+# if [ -f "myvenv/bin/activate" ]; then
+#     source myvenv/bin/activate
+# elif [ -f "myvenv/Scripts/activate" ]; then
+#     source myvenv/Scripts/activate
+# else
+#     echo "Failed to find the virtual environment activation script"
+#     exit 1
+# fi
 
 pip install -r requirements.txt
 
 # execute python code
 python run_psql_script.py
 
-# Deactivate the virtual environment
-deactivate
+# # Deactivate the virtual environment
+# if [ -f "myvenv/bin/deactivate" ]; then
+#     source myvenv/bin/deactivate
+# elif [ -f "myvenv/Scripts/deactivate" ]; then
+#     source myvenv/Scripts/deactivate
+# else
+#     echo "Failed to find the virtual environment deactivation script"
+#     exit 1
+# fi
 
