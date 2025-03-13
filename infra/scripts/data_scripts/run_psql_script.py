@@ -8,14 +8,6 @@ admin_principal_name = "admin_principal_name_place_holder"
 identity_name = "identity_name_place_holder"
 database_name= "database_name_place_holder"
 
-# # resource group: my-bicep-3-12-1-rg example 
-# key_vault_name = "chatbotoz5ptokv"
-# host_name = "chatbotoz5ptopgserver.postgres.database.azure.com"
-# admin_principal_name = "chatbotPsqlAdminUser"
-# identity_name = "chatbotoz5ptorgMid"
-# database_name= "postgres"
-
-
 
 # Grant Permission Function
 def grant_permissions(cursor, db_name, schema_name, principal_name):
