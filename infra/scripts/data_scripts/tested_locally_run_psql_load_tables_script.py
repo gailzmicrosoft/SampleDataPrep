@@ -6,12 +6,17 @@ import os
 import pandas as pd
 
 # Configuration parameters
-key_vault_name = "key_vault_name_place_holder"
-host_name = "host_name_place_holder"
-admin_principal_name = "admin_principal_name_place_holder"
-identity_name = "identity_name_place_holder"
-database_name = "database_name_place_holder"
-basrUrl = "basrUrl_place_holder"
+key_vault_name = "your_key_vault_name_here"
+# Note: The key vault name is not used in this script, but it's included for completeness.
+host_name = "yourpostgresqlservername.postgres.database.azure.com"
+admin_principal_name = "admin_principal_name_place_holder" # not used in testing
+identity_name = "PsqlAdminUser" # use an authorized user name here to test the script
+database_name = "postgres"
+basrUrl = "https://raw.githubusercontent.com/gailzmicrosoft/TestCode/main/infra/"
+
+# look for this line in main program and change to your own value 
+#access_token = "fake_password_here" #
+
 
 def truncate_tables(cursor, tables):
     """
@@ -39,15 +44,17 @@ def main():
     try:
         # Acquire the access token
         print("Acquiring access token...")
-        cred = DefaultAzureCredential()
-        access_token = cred.get_token("https://ossrdbms-aad.database.windows.net/.default")
-        print("Access token acquired.")
+        # cred = DefaultAzureCredential()
+        # access_token = cred.get_token("https://ossrdbms-aad.database.windows.net/.default")
+        # print("Access token acquired.")
+        
+        print("database: {} server_name: {}".format(database_name, host_name))
         
         # Combine the token with the connection string to establish the connection.
-        print("Establishing database connection...")
+        access_token = "fake_password_here" #
         conn_string = (
             "host={0} user={1} dbname={2} password={3} sslmode=require".format(
-                host_name, identity_name, database_name, access_token.token
+                host_name, identity_name, database_name, access_token
             )
         )
         
