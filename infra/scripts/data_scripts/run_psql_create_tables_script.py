@@ -1,3 +1,4 @@
+# version 1.0 
 from azure.identity import DefaultAzureCredential
 import psycopg2
 from psycopg2 import sql
