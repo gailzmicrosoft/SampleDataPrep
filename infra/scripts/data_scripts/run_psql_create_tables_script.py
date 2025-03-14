@@ -129,7 +129,7 @@ CREATE TABLE orders
     customer_phone character varying(20),
     order_date date,
     product_id integer,
-    product_name character varying(100) NOT NULL,
+    product_name character varying(100),
     quantity integer,
     unit_price numeric(10,2),
     total numeric(10,2),
