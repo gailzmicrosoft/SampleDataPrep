@@ -12,7 +12,7 @@ host_name="$5"
 database_name="$6"
 admin_principal_name="$7"
 identity_name="$8"  # managed identity user name. Wil use this to connect to the postgres server 
-requirementFile="requirements_load_tables.txt"
+requirementFile="requirements.txt"
 requirementFileUrl=${baseUrl}"scripts/data_scripts/requirements_load_tables.txt"
 
 echo "Script Started"
@@ -40,7 +40,7 @@ sed -i "s/identity_name_place_holder/${identity_name}/g" "run_psql_load_tables_s
 
 
 # Install the required packages
-pip install -r requirements_load_tables.txt
+pip install -r requirements.txt
 
 # execute python code
 python run_psql_load_tables_script.py
