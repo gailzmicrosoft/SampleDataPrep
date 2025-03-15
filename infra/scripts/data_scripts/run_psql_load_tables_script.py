@@ -4,6 +4,7 @@ import psycopg2.extras
 from psycopg2 import sql
 import os
 import pandas as pd
+import logging
 
 # Configuration parameters
 key_vault_name = "key_vault_name_place_holder"
@@ -13,13 +14,17 @@ identity_name = "identity_name_place_holder"
 database_name = "database_name_place_holder"
 basrUrl = "basrUrl_place_holder"
 
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
 def truncate_tables(cursor, tables):
     """
     Truncate the specified tables.
     """
     for table in tables:
         cursor.execute(sql.SQL("TRUNCATE TABLE {}").format(sql.Identifier(table)))
-    print("Tables truncated: {}".format(", ".join(tables)))
+    logger.info("Tables truncated: %s", ", ".join(tables))
 
 def load_table_from_csv(cursor, table_name, csv_file_path, columns):
     """
@@ -33,18 +38,18 @@ def load_table_from_csv(cursor, table_name, csv_file_path, columns):
         sql.SQL(', ').join(map(sql.Identifier, columns))
     )
     psycopg2.extras.execute_values(cursor, insert_query, rows)
-    print("Data loaded into {} table.".format(table_name))
+    logger.info("Data loaded into %s table.", table_name)
 
 def main():
     try:
         # Acquire the access token
-        print("Acquiring access token...")
+        logger.info("Acquiring access token...")
         cred = DefaultAzureCredential()
         access_token = cred.get_token("https://ossrdbms-aad.database.windows.net/.default")
-        print("Access token acquired.")
+        logger.info("Access token acquired.")
         
         # Combine the token with the connection string to establish the connection.
-        print("Establishing database connection...")
+        logger.info("Establishing database connection...")
         conn_string = (
             "host={0} user={1} dbname={2} password={3} sslmode=require".format(
                 host_name, identity_name, database_name, access_token.token
@@ -53,7 +58,7 @@ def main():
         
         conn = psycopg2.connect(conn_string)
         cursor = conn.cursor()
-        print("Database connection established.")
+        logger.info("Database connection established.")
         
         # Truncate the tables
         truncate_tables(cursor, ["products", "customers", "orders"])
@@ -78,7 +83,7 @@ def main():
         conn.commit()
         
     except Exception as e:
-        print("An error occurred: {}".format(e))
+        logger.error("An error occurred: %s", e)
         conn.rollback()  # Rollback the transaction in case of error
     finally:
         if cursor:
