@@ -1,7 +1,8 @@
 #requirements for run_psql_load_tables.py
 psycopg2-binary==2.9.10
 azure-identity==1.7.0
-azure-keyvault-secrets==4.3.0
+# azure-cli 2.52.0 reuires 4.7.0 (4.3.0 did not work) 
+azure-keyvault-secrets==4.7.0
 # panas versions: 1.05, 1.2.5, 1.2.5 
 #pandas==1.0.5
 
