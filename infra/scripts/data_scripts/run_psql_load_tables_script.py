@@ -14,11 +14,6 @@ identity_name = "identity_name_place_holder"
 database_name = "database_name_place_holder"
 basrUrl = "basrUrl_place_holder"
 
-# for local testing only:
-identity_name = "chatbotPsqlAdminUser"
-password = "Chatbotdbpassword123"
-host_name  = "chatbotoz5ptopgserver.postgres.database.azure.com"
-
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -58,7 +53,7 @@ def main():
         logger.info("Establishing database connection...")
         conn_string = (
             "host={0} user={1} dbname={2} password={3} sslmode=require".format(
-                host_name, identity_name, database_name, password
+                host_name, identity_name, database_name, access_token.token
             )
         )
         
