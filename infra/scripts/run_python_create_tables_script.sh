@@ -38,7 +38,7 @@ sed -i "s/admin_principal_name_place_holder/${admin_principal_name}/g" "run_psql
 sed -i "s/identity_name_place_holder/${identity_name}/g" "run_psql_create_tables_script.py"
 
 # Install the required packages
-pip install -r requirements.txt
+pip install --no-cache-dir -r requirements.txt
 
 # execute python code
 python run_psql_create_tables_script.py

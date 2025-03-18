@@ -40,7 +40,7 @@ sed -i "s/identity_name_place_holder/${identity_name}/g" "run_psql_load_tables_s
 
 
 # Install the required packages
-pip install -r requirements.txt
+pip install --no-cache-dir -r requirements.txt
 
 # execute python code
 python run_psql_load_tables_script.py
