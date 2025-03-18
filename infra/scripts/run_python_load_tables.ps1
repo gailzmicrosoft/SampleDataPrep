@@ -38,7 +38,7 @@ Write-Output "Script Started"
 $publicIp = Invoke-RestMethod -Uri "https://api.ipify.org"
 
 # Use Azure CLI to add the public IP to the PostgreSQL firewall rule
-az postgres flexible-server firewall-rule create --resource-group $resourceGroup --name $postgres_server_name --rule-name "AllowScriptIp" --start-ip-address $publicIp --end-ip-address $publicIp
+# az postgres flexible-server firewall-rule create --resource-group $resourceGroup --name $postgres_server_name --rule-name "AllowScriptIp" --start-ip-address $publicIp --end-ip-address $publicIp
 
 # Download the Python script
 Invoke-WebRequest -Uri "${baseUrl}scripts/data_scripts/run_psql_load_tables_script.py" -OutFile "run_psql_load_tables_script.py"
