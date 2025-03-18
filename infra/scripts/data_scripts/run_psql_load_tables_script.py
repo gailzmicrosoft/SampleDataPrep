@@ -5,6 +5,7 @@ from psycopg2 import sql
 import os
 import pandas as pd
 import logging
+import sys  # Added import
 
 # Configuration parameters
 key_vault_name = "key_vault_name_place_holder"
@@ -15,7 +16,8 @@ database_name = "database_name_place_holder"
 basrUrl = "basrUrl_place_holder"
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[logging.StreamHandler(sys.stdout)])
+
 logger = logging.getLogger(__name__)
 
 def truncate_tables(cursor, tables):
