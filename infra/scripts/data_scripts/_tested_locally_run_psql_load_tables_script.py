@@ -4,19 +4,22 @@ import psycopg2.extras
 from psycopg2 import sql
 import os
 import pandas as pd
+import logging
 
 # Configuration parameters
-key_vault_name = "your_key_vault_name_here"
-# Note: The key vault name is not used in this script, but it's included for completeness.
-host_name = "xyz.postgres.database.azure.com"
-admin_principal_name = "admin_principal_name_place_holder" # not used in testing
-identity_name = "yourAdminUserName" # use an authorized user name here to test the script
-database_name = "postgres"
-basrUrl = "https://raw.githubusercontent.com/gailzmicrosoft/TestCode/main/infra/"
+key_vault_name = "key_vault_name_place_holder"
+host_name = "yourserver.postgres.database.azure.com" # used for local testing
+admin_principal_name = "yourAdmUserName" # used for local testing
+identity_name = "identity_name_place_holder"
+database_name = "postgres" # used for local testing
+basrUrl = "basrUrl_place_holder"
+admin_principal_password = "YourAdmUserPass"  # used for local testing
+# change below to your own value for local testing:
+basrUrl = "https://raw.githubusercontent.com/gailzmicrosoft/TestCode/main/infra/" # used for local testing
 
-# look for this line in main program and change to your own value 
-#access_token = "Fake_password" #
-
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 def truncate_tables(cursor, tables):
     """
@@ -24,7 +27,7 @@ def truncate_tables(cursor, tables):
     """
     for table in tables:
         cursor.execute(sql.SQL("TRUNCATE TABLE {}").format(sql.Identifier(table)))
-    print("Tables truncated: {}".format(", ".join(tables)))
+    logger.info("Tables truncated: %s", ", ".join(tables))
 
 def load_table_from_csv(cursor, table_name, csv_file_path, columns):
     """
@@ -38,55 +41,69 @@ def load_table_from_csv(cursor, table_name, csv_file_path, columns):
         sql.SQL(', ').join(map(sql.Identifier, columns))
     )
     psycopg2.extras.execute_values(cursor, insert_query, rows)
-    print("Data loaded into {} table.".format(table_name))
+    logger.info("Data loaded into %s table.", table_name)
 
 def main():
     try:
         # Acquire the access token
-        print("Acquiring access token...")
-        # cred = DefaultAzureCredential()
-        # access_token = cred.get_token("https://ossrdbms-aad.database.windows.net/.default")
-        # print("Access token acquired.")
-        
-        print("database: {} server_name: {}".format(database_name, host_name))
+        logger.info("Acquiring access token...")
+        cred = DefaultAzureCredential()
+        access_token = cred.get_token("https://ossrdbms-aad.database.windows.net/.default")
+        logger.info("Access token acquired.")
         
         # Combine the token with the connection string to establish the connection.
-        access_token = "Fake_password" #
+        logger.info("Establishing database connection...")
         conn_string = (
             "host={0} user={1} dbname={2} password={3} sslmode=require".format(
-                host_name, identity_name, database_name, access_token
+        #       host_name, identity_name, database_name, access_token.token
+               host_name, admin_principal_name, database_name, admin_principal_password
             )
         )
         
         conn = psycopg2.connect(conn_string)
         cursor = conn.cursor()
-        print("Database connection established.")
-        
+        logger.info("Database connection established.")
+
+        try:
         # Truncate the tables
-        truncate_tables(cursor, ["products", "customers", "orders"])
-        conn.commit()
-        
+            truncate_tables(cursor, ["products", "customers", "orders"])
+            conn.commit()
+        except Exception as e:
+            logger.error("An error occurred while truncating tables: %s", e)
+            conn.rollback() # Rollback the transaction in case of error
+
+        try:
         # Load data into the products table
-        csv_file_path_products = os.path.join(basrUrl, 'data/postgresql_db_sample_data/products.csv')
-        load_table_from_csv(cursor, 'products', csv_file_path_products, 
-            ['id', 'product_name', 'price', 'category', 'brand', 'product_description'])
-        conn.commit()
-        
+            csv_file_path_products = os.path.join(basrUrl, 'data/postgresql_db_sample_data/products.csv')
+            load_table_from_csv(cursor, 'products', csv_file_path_products, 
+                ['id', 'product_name', 'price', 'category', 'brand', 'product_description'])
+            conn.commit()
+        except Exception as e:
+            logger.error("An error occurred while loading products table: %s", e)
+            conn.rollback() # Rollback the transaction in case of error
+
+        try:
         # Load data into the customers table
-        csv_file_path_customers = os.path.join(basrUrl, 'data/postgresql_db_sample_data/customers.csv')
-        load_table_from_csv(cursor, 'customers', csv_file_path_customers, 
-            ['id', 'first_name', 'last_name', 'gender', 'date_of_birth', 'age', 'email', 'phone', 'post_address', 'membership'])
-        conn.commit()
+            csv_file_path_customers = os.path.join(basrUrl, 'data/postgresql_db_sample_data/customers.csv')
+            load_table_from_csv(cursor, 'customers', csv_file_path_customers, 
+                ['id', 'first_name', 'last_name', 'gender', 'date_of_birth', 'age', 'email', 'phone', 'post_address', 'membership'])
+            conn.commit()
+        except Exception as e:
+            logger.error("An error occurred while loading customers table: %s", e)
+            conn.rollback() # Rollback the transaction in case of error
         
+        try:
         # Load data into the orders table
-        csv_file_path_orders = os.path.join(basrUrl, 'data/postgresql_db_sample_data/orders.csv')
-        load_table_from_csv(cursor, 'orders', csv_file_path_orders, 
-            ['id', 'customer_id', 'product_id', 'quantity', 'total', 'order_date', 'customer_first_name', 'customer_last_name', 'unit_price', 'category', 'brand', 'product_description', 'return_status'])
-        conn.commit()
-        
+            csv_file_path_orders = os.path.join(basrUrl, 'data/postgresql_db_sample_data/orders.csv')
+            load_table_from_csv(cursor, 'orders', csv_file_path_orders, 
+                ['id', 'customer_id', 'product_id', 'quantity', 'total', 'order_date', 'customer_first_name', 'customer_last_name', 'unit_price', 'category', 'brand', 'product_description', 'return_status'])
+            conn.commit()
+        except Exception as e:
+            logger.error("An error occurred while loading orders table: %s", e)
+            conn.rollback() # Rollback the transaction in case of error
+
     except Exception as e:
-        print("An error occurred: {}".format(e))
-        conn.rollback()  # Rollback the transaction in case of error
+        logger.error("An error occurred while executint main program: %s", e)
     finally:
         if cursor:
             cursor.close()

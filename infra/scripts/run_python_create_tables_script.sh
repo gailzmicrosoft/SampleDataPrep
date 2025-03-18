@@ -13,7 +13,7 @@ database_name="$6"
 admin_principal_name="$7"
 identity_name="$8"  # managed identity user name. Wil use this to connect to the postgres server 
 requirementFile="requirements.txt"
-requirementFileUrl=${baseUrl}"scripts/data_scripts/requirements.txt"
+requirementFileUrl=${baseUrl}"scripts/data_scripts/requirements_create_tables.txt"
 
 echo "Script Started"
 
