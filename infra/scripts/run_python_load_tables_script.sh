@@ -13,7 +13,7 @@ database_name="$6"
 admin_principal_name="$7"
 identity_name="$8"  # managed identity user name. Wil use this to connect to the postgres server 
 requirementFile="requirements.txt"
-requirementFileUrl=${baseUrl}"scripts/data_scripts/requirements_load_tables.txt"
+requirementFileUrl=${baseUrl}"infra/scripts/data_scripts/requirements_load_tables.txt"
 
 echo "Script Started"
 
@@ -23,7 +23,7 @@ publicIp=$(curl -s https://api.ipify.org)
 # Use Azure CLI to add the public IP to the PostgreSQL firewall rule
 az postgres flexible-server firewall-rule create --resource-group $resourceGroup --name $postgres_server_name --rule-name "AllowScriptIp" --start-ip-address "$publicIp" --end-ip-address "$publicIp"
 
-curl --output "run_psql_load_tables_script.py" ${baseUrl}"scripts/data_scripts/run_psql_load_tables_script.py"
+curl --output "run_psql_load_tables_script.py" ${baseUrl}"infra/scripts/data_scripts/run_psql_load_tables_script.py"
 
 # Download the requirement file
 curl --output "$requirementFile" "$requirementFileUrl"

@@ -2,27 +2,20 @@
 param (
     [Parameter(Mandatory=$true)]
     [string]$baseUrl,
-
     [Parameter(Mandatory=$true)]
     [string]$resourceGroup,
-
     [Parameter(Mandatory=$true)]
     [string]$key_vault_name,
-
     [Parameter(Mandatory=$true)]
     [string]$postgres_server_name,
-
     [Parameter(Mandatory=$true)]
     [string]$host_name,
-
     [Parameter(Mandatory=$true)]
     [string]$database_name,
-
     [Parameter(Mandatory=$true)]
     [string]$admin_principal_name,
-
     [Parameter(Mandatory=$true)]
-    [string]$identity_name  # managed identity user name. Will use this to connect to the postgres server
+    [string]$identity_name
 )
 
 # Display a message indicating the script has started
@@ -30,7 +23,7 @@ Write-Output "started the script"
 
 # Variables
 $requirementFile = "requirements.txt"
-$requirementFileUrl = "${baseUrl}scripts/data_scripts/requirements_load_tables.txt"
+$requirementFileUrl = "${baseUrl}infra/scripts/data_scripts/requirements_load_tables.txt"
 
 Write-Output "Script Started"
 
@@ -41,7 +34,7 @@ $publicIp = Invoke-RestMethod -Uri "https://api.ipify.org"
 az postgres flexible-server firewall-rule create --resource-group $resourceGroup --name $postgres_server_name --rule-name "AllowScriptIp" --start-ip-address $publicIp --end-ip-address $publicIp
 
 # Download the Python script
-Invoke-WebRequest -Uri "${baseUrl}scripts/data_scripts/run_psql_load_tables_script.py" -OutFile "run_psql_load_tables_script.py"
+Invoke-WebRequest -Uri "${baseUrl}infra/scripts/data_scripts/run_psql_load_tables_script.py" -OutFile "run_psql_load_tables_script.py"
 
 # Download the requirement file
 Invoke-WebRequest -Uri $requirementFileUrl -OutFile $requirementFile
