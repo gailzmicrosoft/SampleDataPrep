@@ -31,16 +31,16 @@ curl --output "$requirementFile" "$requirementFileUrl"
 echo "Download completed"
 
 # Replace place_holder values in the script with actual values
-sed -i "s/key_vault_name_place_holder/${key_vault_name}/g" "run_psql_create_tables_script.py"
-sed -i "s/host_name_place_holder/${host_name}/g" "run_psql_create_tables_script.py"
-sed -i "s/database_name_place_holder/${database_name}/g" "run_psql_create_tables_script.py"
-sed -i "s/admin_principal_name_place_holder/${admin_principal_name}/g" "run_psql_create_tables_script.py"
-sed -i "s/identity_name_place_holder/${identity_name}/g" "run_psql_create_tables_script.py"
+# sed -i "s/key_vault_name_place_holder/${key_vault_name}/g" "run_psql_create_tables_script.py"
+# sed -i "s/host_name_place_holder/${host_name}/g" "run_psql_create_tables_script.py"
+# sed -i "s/database_name_place_holder/${database_name}/g" "run_psql_create_tables_script.py"
+# sed -i "s/admin_principal_name_place_holder/${admin_principal_name}/g" "run_psql_create_tables_script.py"
+# sed -i "s/identity_name_place_holder/${identity_name}/g" "run_psql_create_tables_script.py"
 
 # Install the required packages
 pip install --no-cache-dir -r requirements.txt
 
 # execute python code
-python run_psql_create_tables_script.py
+python run_psql_create_tables_script.py --key_vault_name ${key_vault_name} --host_name ${host_name} --database_name ${database_name} --admin_principal_name ${admin_principal_name} --identity_name ${identity_name} --baseUrl ${baseUrl}
 
 
