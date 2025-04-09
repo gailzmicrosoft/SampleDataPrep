@@ -12,7 +12,7 @@ param identityName string // Name of the managed identity
 
 var myArguments= '${baseUrl} ${resourceGroup().name} ${keyVaultName} ${postgreSqlServerName} ${postgresSqlEndPoint} ${postgreSqlDbName} ${adminPrincipalName} ${identityName}'
 
-resource create_index_create_tables 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
+resource psql_create_tables 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
   kind:'AzureCLI'
   name: 'runPythonWithBashScriptCreateTables'
   location: location // Replace with your desired location
@@ -24,7 +24,7 @@ resource create_index_create_tables 'Microsoft.Resources/deploymentScripts@2020-
   }
   properties: {
     azCliVersion: '2.52.0'
-    primaryScriptUri: '${baseUrl}infra/scripts/python_create_tables_script.sh'
+    primaryScriptUri: '${baseUrl}infra/scripts/psql_create_tables_script.sh'
     arguments: myArguments
     retentionInterval: 'PT1H' // Specify the desired retention interval
     cleanupPreference:'OnSuccess'
