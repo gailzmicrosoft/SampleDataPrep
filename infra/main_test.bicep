@@ -14,7 +14,7 @@ param createResourceGroup bool = false
 param rgName string 
 
 @description('Deployment Location')
-param location string = 'eastus2'
+param location string = 'centralus' // 'eastus2' // 'eastus' // 'westus2' // 'westeurope' // 'uksouth' // 'centralus' // 'australiaeast'
 
 @description('Postgresql Server Admin User Name')
 param postgreSqlServerAdminLogin string = 'chatbotPsqlAdminUser'
@@ -461,15 +461,15 @@ module containerApp './core/host/containerapp.bicep' = {
 
 var myBaseURL = 'https://raw.githubusercontent.com/gailzmicrosoft/TestCode/main/'
 
-module deployPsqlScriptCreateTables './core/database/deploy_psql_create_tables_script.bicep' = if (databaseType == 'PostgreSQL') {
-  name: 'deploy_psql_create_tables_script'
+module deployPsqlScriptCreateTables './core/database/psql_create_tables_script.bicep' = if (databaseType == 'PostgreSQL') {
+  name: 'main_deploy_psql_create_tables_script'
   scope: rg
   params: {
     location: location
     baseUrl: myBaseURL
-    keyVaultName: keyVaultName
     postgreSqlServerName: postgreSqlResource.outputs.serverName
     postgresSqlEndPoint: postgreSqlResource.outputs.endPoint
+    //postgresSqlEndPoint: '${postgreSqlServerName}.postgres.database.azure.com'
     postgreSqlDbName: postgreSqlResource.outputs.dBName
     adminPrincipalName: postgreSqlResource.outputs.adminLogin
     identity:userAssignedMid.outputs.managedIdentityOutput.id

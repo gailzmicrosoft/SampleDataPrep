@@ -4,14 +4,14 @@ FROM python:3.9-slim
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy only the requirements file first to leverage Docker's caching
-COPY requirements.txt .
+# Copy the requirements file into the container
+COPY testapp/requirements.txt .
 
 # Install the dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code into the container
-COPY . /app
+COPY testapp .
 
 # Set environment variables
 ENV FLASK_APP=app.py
@@ -22,4 +22,4 @@ ENV FLASK_RUN_PORT=8080
 EXPOSE 8080
 
 # Run the application
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8080", "app:app"]
+CMD ["flask", "run"]

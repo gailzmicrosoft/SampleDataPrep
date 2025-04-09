@@ -59,11 +59,6 @@ resource serverName_resource 'Microsoft.DBforPostgreSQL/flexibleServers@2023-12-
   }
 }
 
-output serverName string = serverName_resource.name
-output endPoint string = '${serverName_resource.name}.postgres.database.azure.com'
-output dBName string = databaseName
-output adminLogin string = administratorLogin
-output sslMode string = 'Require'
 
 resource delayScript 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
   name: 'waitForServerReady'
@@ -138,3 +133,11 @@ output postgreSqlDetails object = {
   adminPassword: administratorLoginPassword
   sslMode: 'Require'
 }
+
+
+
+output serverName string = serverName_resource.name
+output endPoint string = '${serverName_resource.name}.postgres.database.azure.com'
+output dBName string = databaseName
+output adminLogin string = administratorLogin
+output sslMode string = 'Require'

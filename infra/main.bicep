@@ -7,14 +7,17 @@ targetScope = 'subscription'
 @description('Name of the solution. This is used to generate a short unique hash used in all resources.')
 param solutionName string = 'chatbot'
 
+@description('Set to true to create the resource group. Set to false if the resource group already exists.')
+param createResourceGroup bool = false
+
 @description('Name of the resource group to be used')
 param rgName string 
 
 @description('Deployment Location')
-param location string = 'centralus'
+param location string = 'centralus' // 'eastus2' // 'eastus' // 'westus2' // 'westeurope' // 'uksouth' // 'centralus' // 'australiaeast'
 
 @description('Postgresql Server Admin User Name')
-param postgreSqlServerAdminUser string = 'chatbotPsqlAdminUser'
+param postgreSqlServerAdminLogin string = 'chatbotPsqlAdminUser'
 
 
 /**************************************************************************/
@@ -42,27 +45,31 @@ var postgreSqlServerAdminPassword = 'Hybrid-Prototype-Pass-12345!' // Capital an
 var useKeyVault = true
 //var authType = 'rbac' // 'keyvault' or 'rbac'
 var keyVaultName = '${resourcePrefix}kv'
-var databaseType = 'PostgreSQL' 
+var databaseType = 'PostgreSQL'
+var databaseName = 'postgres' // default database name for PostgreSQL server
 
 
 
 
 // container registry name and image name
 var containerRegistryName = '${resourcePrefix}acr'
-var dockerImageName = 'pythonapiapp' // This image must be built and pushed to the container registry already
-var imageVersion = 'latest'
-var dockerImageURL = '${containerRegistryName}.azurecr.io/${dockerImageName}:${imageVersion}'
+var dockerImageName = 'chatbottestapp' // This image must be built and pushed to the container registry already
+var dockerImageVersion = 'latest'
+var dockerImageURL = '${containerRegistryName}.azurecr.io/${dockerImageName}:${dockerImageVersion}'
 // test images
-var dockerImageURL1 = 'docker.io/library/nginx:latest'
-var dockerImageURL2 = 'mcr.microsoft.com/azuredocs/aci-helloworld:latest'
+var testDockerImageURL = 'docker.io/library/nginx:latest' // 'mcr.microsoft.com/azuredocs/aci-helloworld:latest'
 
 
 /**************************************************************************/
 // This is the main resource group for the solution. 
 /**************************************************************************/
-resource rg 'Microsoft.Resources/resourceGroups@2024-03-01' = {
+resource rg 'Microsoft.Resources/resourceGroups@2024-03-01' = if (createResourceGroup) {
   name: rgName
   location: location
+}
+
+resource existingRg 'Microsoft.Resources/resourceGroups@2024-03-01' existing = if (!createResourceGroup) {
+  name: rgName
 }
 
 
@@ -85,7 +92,7 @@ module userAssignedMid './core/security/managed-identity.bicep' = {
 // create a key vault and store secrets
 /**************************************************************************/
 // create a key vault
-module keyvault './core/security/keyvault.bicep' = if (useKeyVault) { 
+module keyVault './core/security/keyvault.bicep' = if (useKeyVault) { 
   name: keyVaultName
   scope: rg
   params: {
@@ -99,11 +106,11 @@ module keyvault './core/security/keyvault.bicep' = if (useKeyVault) {
 }
 // create a key vault access policy for the managed identity
 // to access the key vault
-module keyvaulAccess './core/security/keyvault-access.bicep' = if (useKeyVault) {
+module keyVaultAccess './core/security/keyvault-access.bicep' = if (useKeyVault) {
   name: '${keyVaultName}keyvaultPolicy'
   scope: rg
   dependsOn: [
-    keyvault // Ensure keyvault is created before keyvaulAccess
+    keyVault
   ]
   params: {
     keyVaultName: keyVaultName
@@ -111,9 +118,8 @@ module keyvaulAccess './core/security/keyvault-access.bicep' = if (useKeyVault) 
     permissions: {
       secrets: [
         'get'
-        'list'
         'set'
-        'delete'
+        'list'
       ]
     }
   }
@@ -123,7 +129,7 @@ module keyvaulAccess './core/security/keyvault-access.bicep' = if (useKeyVault) 
 /**************************************************************************/
 // Create a storage account and a container
 /**************************************************************************/
-var initial_blob_containers = [ { name: 'raw' }, { name: 'processed' } ]
+var initialBlobContainers = [ { name: 'raw' }, { name: 'processed' }, {name: 'results'} ]
 module storageModule './core/storage/storage-account.bicep' = {
   name: storageAccountName
   scope: rg
@@ -141,23 +147,23 @@ module storageModule './core/storage/storage-account.bicep' = {
       defaultAction: 'Allow'
     }
     publicNetworkAccess: 'Enabled'
-    containers: initial_blob_containers
+    containers: initialBlobContainers
   }
 }
 
 /*************************************************************************************/
 // Create azure database for postgresql server with default database 'postgres'
 /*************************************************************************************/
-module postgresDBModule './core/database/postgresdb.bicep' = if (databaseType == 'PostgreSQL') {
-  name: 'deploy_postgres_sql'
+module postgreSqlResource './core/database/postgresdb.bicep' = if (databaseType == 'PostgreSQL') {
+  name: 'deployPostgresSqlServerResources'
   scope: rg
   params: {
     location:location
     serverName:postgreSqlServerName
     version: '11'
-    administratorLogin: postgreSqlServerAdminUser
+    administratorLogin: postgreSqlServerAdminLogin
     administratorLoginPassword: postgreSqlServerAdminPassword
-    additionalDatabase: '' // If it is same as postgres or it is empty, it will not be created. postgres is created by default 
+    databaseName: databaseName
     serverEdition: 'Burstable'
     skuSizeGB:32
     dbInstanceType: 'Standard_B4ms' // available SKUs: B1ms, B2ms, B4ms, B8ms, B16ms
@@ -172,13 +178,13 @@ module postgresDBModule './core/database/postgresdb.bicep' = if (databaseType ==
 
 // store the postgresql server name in key vault
 module keyvaultSecretPostgreServerName './core/security/keyvault-secret.bicep' = if (useKeyVault) {
-  name: 'postgresql-server-name'
+  name: 'kvNameAsPostgreSqlServerName'
   scope: rg
   dependsOn: [
-    keyvault // Ensure keyvault is created before keyvaultSecret
+    keyVault // Ensure keyvault is created before keyvaultSecret
   ]
   params: {
-    name: 'postgresql-server-name'
+    name: 'postgresqlServerName'
     tags: {}
     keyVaultName: keyVaultName
     contentType: 'string'
@@ -193,13 +199,13 @@ module keyvaultSecretPostgreServerName './core/security/keyvault-secret.bicep' =
 
 // store the postgresql server name in key vault
 module keyvaultSecretPostgreServerDbName './core/security/keyvault-secret.bicep' = if (useKeyVault) {
-  name: 'postgresql_db_name'
+  name: 'kvNameAsPostgreSqlDbName'
   scope: rg
   dependsOn: [
-    keyvault // Ensure keyvault is created before keyvaultSecret
+    keyVault // Ensure keyvault is created before keyvaultSecret
   ]
   params: {
-    name: 'postgresql_db_name'
+    name: 'postgresqlDbName'
     tags: {}
     keyVaultName: keyVaultName
     contentType: 'string'
@@ -212,13 +218,13 @@ module keyvaultSecretPostgreServerDbName './core/security/keyvault-secret.bicep'
 
 // store the postgresql server name in key vault
 module keyvaultSecretPostgreServerEndPoint './core/security/keyvault-secret.bicep' = if (useKeyVault) {
-  name: 'postgresql_end_point'
+  name: 'kvNameAsPostgreSqlEndPoint'
   scope: rg
   dependsOn: [
-    keyvault // Ensure keyvault is created before keyvaultSecret
+    keyVault // Ensure keyvault is created before keyvaultSecret
   ]
   params: {
-    name: 'postgresql_end_point'
+    name: 'postgresqlEndPoint'
     tags: {}
     keyVaultName: keyVaultName
     contentType: 'string'
@@ -232,17 +238,17 @@ module keyvaultSecretPostgreServerEndPoint './core/security/keyvault-secret.bice
 
 // store the postgresql server admin user in key vault
 module keyvaultSecretPostgreAdminUser './core/security/keyvault-secret.bicep' = if (useKeyVault) {
-  name: 'postgresql_admin_login'
+  name: 'kvNameAsPostgreSqlAdminLogin'
   scope: rg
   dependsOn: [
-    keyvault // Ensure keyvault is created before keyvaultSecret
+    keyVault // Ensure keyvault is created before keyvaultSecret
   ]
   params: {
-    name: 'postgresql_admin_login'
+    name: 'postgresqlAdminLogin'
     tags: {}
     keyVaultName: keyVaultName
     contentType: 'string'
-    secretValue: postgreSqlServerAdminUser
+    secretValue: postgreSqlServerAdminLogin
     enabled: true
     exp: 0 // No expiration time
     nbf: 0 // Valid immediately
@@ -251,13 +257,13 @@ module keyvaultSecretPostgreAdminUser './core/security/keyvault-secret.bicep' = 
 }
 // store the postgresql server admin password in key vault
 module keyvaultSecretPostgreAdminPassword './core/security/keyvault-secret.bicep' = if (useKeyVault) {
-  name: 'postgresql-server-admin-password'
+  name: 'kvNameAsPostgreSqlServerAdminPassword'
   scope: rg
   dependsOn: [
-    keyvault // Ensure keyvault is created before keyvaultSecret
+    keyVault // Ensure keyvault is created before keyvaultSecret
   ]
   params: {
-    name: 'postgresql-server-admin-password'
+    name: 'postgresqlAdminPassword'
     tags: {}
     keyVaultName: keyVaultName
     contentType: 'string'
@@ -274,10 +280,12 @@ module keyvaultSecretPostgreAdminPassword './core/security/keyvault-secret.bicep
 // If Use existing PostgreSQL server and other resources created above
 /**************************************************************************/
 // // Reference the existing PostgreSQL server and other resources
-// resource postgresDBModule 'Microsoft.DBforPostgreSQL/servers@2022-11-01' existing = {
+// resource posgreSqlResource 'Microsoft.DBforPostgreSQL/servers@2022-11-01' existing = {
 //   name: 'deploy_postgres_sql'
 //   scope: rg
 // }
+
+
 
 
 // Create Container Registry
@@ -290,19 +298,54 @@ module containerregistry './core/host/azurecontainerregistry.bicep' = {
   }
 }
 
-/**************************************************************************/
-// If Use existing container registry created already somewhere else
-/************************************************* *************************/
-// If the container registry is created in a different resource group, 
-// uncomment the following lines and comment the above lines
-// resource acr_rg 'Microsoft.Resources/resourceGroups@2024-03-01' = existing {
-//   name: acr_rgName
-// }
-// resource containerRegistry 'Microsoft.ContainerRegistry/registries@2021-12-01-preview' existing = {
+
+
+// // Create Container Registry
+// module acrResource './core/host/azurecontainerregistry_with_tasks.bicep' = {
 //   name: containerRegistryName
-//   scope: resourceGroup(acr_rgName)
+//   scope: rg
+//   params: {
+//     acrName: containerRegistryName
+//     location: location
+//   }
 // }
-// output containerRegistryId string = containerRegistry.id
+
+
+// // var contextPath = 'https://github.com/gailzmicrosoft/TestCode'
+// // var dockerFilePath = 'Dockerfile_testapp'
+
+// var contextPath = 'https://github.com/gailzmicrosoft/TestCode'
+// var dockerFilePath = 'src/testapp/Dockerfile_testapp'
+
+// module acrTask './core/host/azurecontainerregistry_with_tasks.bicep' = {
+//   name: 'buildAndPushTask'
+//   scope: rg
+//   params: {
+//     // acrName: containerRegistryName
+//     // location: location
+//     acrName: acrResource.outputs.acrName
+//     dockerImageName: dockerImageName
+//     dockerImageTag: dockerImageVersion
+//     contextPath: contextPath
+//     dockerFilePath: dockerFilePath
+//   }
+// }
+
+// module acrTaskRun './core/host/azurecontainerregistry_with_tasks.bicep' = {
+//   name: 'buildAndPushTaskRun'
+//   scope: rg
+//   params: {
+//     acrName: acrResource.outputs.acrName
+//     location: location
+//   }
+//   dependsOn: [
+//     acrTask
+//   ]
+// }
+
+
+
+
 
 
 module logAnalyticsWorkspace './core/monitor/loganalytics.bicep' = {
@@ -371,13 +414,32 @@ var appEnvironVars = [
   }
 ]
 
+
+
+// Secret name must consist of lower case alphanumeric characters, '-', and must start and end with an alphanumeric character. 
+var appSecrets = [
+  {
+    name: 'key-vault-name'
+    value: keyVaultName
+  }
+  {
+    name: 'postgresql-end-point'
+    value: postgreSqlResource.outputs.postgreSqlDetails.endPoint
+  }
+  {
+    name: 'postgreql-db-name'
+    value: postgreSqlResource.outputs.postgreSqlDetails.dBName
+  }
+]
+
 module containerApp './core/host/containerapp.bicep' = {
   name: containerAppName
   scope: rg
   params: {
     containerAppEnvId: containerAppEnv.outputs.id
     location: location
-    image: dockerImageURL2 // for testing purposes for now
+    image: testDockerImageURL // for testing purposes for now
+    //image: dockerImageURL // test the docker image just built in this BICEP code  
     containerAppName: containerAppName
     containerPort: 8000
     cpuCores: 1
@@ -385,30 +447,34 @@ module containerApp './core/host/containerapp.bicep' = {
     minReplicas: 1
     maxReplicas: 10
     environmentVariables: appEnvironVars
-    secrets: [] // will need to add them later 
+    secrets: appSecrets 
     containerRegistryName: containerRegistryName
     userAssignedMidId:userAssignedMid.outputs.id
   }
+  dependsOn: [
+    keyVaultAccess
+    keyVault
+    //acrTaskRun
+  ]
 }
 
 
+// var myBaseURL = 'https://raw.githubusercontent.com/gailzmicrosoft/TestCode/main/'
 
-
-var myBaseURL = 'https://raw.githubusercontent.com/gailzmicrosoft/TestCode/main/infra/'
-
-module deployPsqlScriptCreateTables './core/database/deploy_psql_create_tables_script.bicep' = if (databaseType == 'PostgreSQL') {
-  name: 'deploy_psql_create_tables_script'
-  scope: rg
-  params: {
-    location: location
-    baseUrl: myBaseURL
-    keyVaultName: keyVaultName
-    postgreSqlServerName: postgreSqlServerName
-    postgresSqlServerFQN: postgresDBModule.outputs.postgresDbOutput.postgreSQLServerName
-    postgreSqlDbName: postgresDBModule.outputs.postgresDbOutput.postgreSQLDatabaseName
-    adminPrincipalName:postgresDBModule.outputs.postgresDbOutput.postgresQLDbUser
-    identity:userAssignedMid.outputs.managedIdentityOutput.id
-    identityName: userAssignedMid.outputs.managedIdentityOutput.name
-  }
-}
+// module deployPsqlScriptCreateTables './core/database/psql_create_tables_script.bicep' = if (databaseType == 'PostgreSQL') {
+//   name: 'main_deploy_psql_create_tables_script'
+//   scope: rg
+//   params: {
+//     location: location
+//     baseUrl: myBaseURL
+//     keyVaultName: keyVaultName
+//     postgreSqlServerName: postgreSqlResource.outputs.serverName
+//     postgresSqlEndPoint: postgreSqlResource.outputs.endPoint
+//     //postgresSqlEndPoint: '${postgreSqlServerName}.postgres.database.azure.com'
+//     postgreSqlDbName: postgreSqlResource.outputs.dBName
+//     adminPrincipalName: postgreSqlResource.outputs.adminLogin
+//     identity:userAssignedMid.outputs.managedIdentityOutput.id
+//     identityName: userAssignedMid.outputs.managedIdentityOutput.name
+//   }
+// }
 
