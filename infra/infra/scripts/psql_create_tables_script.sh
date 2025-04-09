@@ -2,16 +2,19 @@
 echo "started the script"
 
 
+
+# '${baseUrl} ${resourceGroup().name} ${postgreSqlServerName} ${postgresSqlEndPoint} ${postgreSqlDbName} ${adminPrincipalName} ${identityName}'
+
+
 # Variables
 
 baseUrl="$1"
 resourceGroup="$2"
-key_vault_name="$3"
-postgres_server_name="$4"
-host_name="$5"
-database_name="$6"
-admin_principal_name="$7"
-identity_name="$8"  # managed identity user name. Wil use this to connect to the postgres server 
+postgres_server_name="$3"
+host_name="$4"
+database_name="$5"
+admin_principal_name="$6"
+identity_name="$7"  # managed identity user name. Wil use this to connect to the postgres server 
 requirementFile="requirements.txt"
 requirementFileUrl=${baseUrl}"infra/scripts/data_scripts/requirements_create_tables.txt"
 
@@ -30,9 +33,10 @@ curl --output "$requirementFile" "$requirementFileUrl"
 
 echo "Download completed"
 
+pip install --upgrade pip
 
 # Install the required packages
 pip install --no-cache-dir -r requirements.txt
 
 # execute python code
-python psql_create_tables_script.py --key_vault_name ${key_vault_name} --host_name ${host_name} --admin_principal_name ${admin_principal_name} --database_name ${database_name} --identity_name ${identity_name}
+python psql_create_tables_script.py --host_name ${host_name} --admin_principal_name ${admin_principal_name} --database_name ${database_name} --identity_name ${identity_name}

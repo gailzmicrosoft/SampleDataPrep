@@ -6,7 +6,6 @@ import logging
 import sys  # Added import
 
 # the values of the parameters will be passed from the calling program
-key_vault_name = None
 host_name = None
 admin_principal_name = None
 identity_name = None
@@ -26,7 +25,7 @@ logging.info(f"Identity Name: {identity_name}")
 logging.info(f"Database Name: {database_name}")
 
 # if any of the parameters are not set, raise an error and exit the script
-if not all([key_vault_name, host_name, admin_principal_name, identity_name, database_name]):
+if not all([host_name, admin_principal_name, identity_name, database_name]):
     logging.error("One or more required parameters are not set. Exiting script.")
     sys.exit(1) 
 

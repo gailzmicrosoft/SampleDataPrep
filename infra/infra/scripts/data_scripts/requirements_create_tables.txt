@@ -1,4 +1,7 @@
 #required for create psql tables python program
 psycopg2-binary==2.9.10
-azure-identity==1.19.0
-azure-keyvault-secrets==4.7.0
+psycopg2-binary==2.9.10
+azure-identity==1.12.0  # Downgraded to ensure compatibility from 1.19.0
+msal==1.24.0b1
+msal-extensions==1.0.0
+
