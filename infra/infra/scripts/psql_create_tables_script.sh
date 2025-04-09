@@ -33,10 +33,11 @@ curl --output "$requirementFile" "$requirementFileUrl"
 
 echo "Download completed"
 
-pip install --upgrade pip
+#pip install --upgrade pip
 
 # Install the required packages
-pip install --no-cache-dir -r requirements.txt
+#pip install --no-cache-dir -r requirements.txt
+pip install -r requirements.txt
 
 # execute python code
 python psql_create_tables_script.py --host_name ${host_name} --admin_principal_name ${admin_principal_name} --database_name ${database_name} --identity_name ${identity_name}

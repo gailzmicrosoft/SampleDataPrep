@@ -467,7 +467,6 @@ module deployPsqlScriptCreateTables './core/database/psql_create_tables_script.b
   params: {
     location: location
     baseUrl: myBaseURL
-    keyVaultName: keyVaultName
     postgreSqlServerName: postgreSqlResource.outputs.serverName
     postgresSqlEndPoint: postgreSqlResource.outputs.endPoint
     //postgresSqlEndPoint: '${postgreSqlServerName}.postgres.database.azure.com'
