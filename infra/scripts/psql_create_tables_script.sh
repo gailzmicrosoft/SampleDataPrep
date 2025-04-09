@@ -1,11 +1,6 @@
 #!/bin/bash
 echo "started the script"
 
-
-
-# '${baseUrl} ${resourceGroup().name} ${postgreSqlServerName} ${postgresSqlEndPoint} ${postgreSqlDbName} ${adminPrincipalName} ${identityName}'
-
-
 # Variables
 
 baseUrl="$1"
@@ -34,6 +29,9 @@ curl --output "$requirementFile" "$requirementFileUrl"
 echo "Download completed"
 
 #pip install --upgrade pip
+
+python -m venv venv
+source venv/bin/activate
 
 # Install the required packages
 #pip install --no-cache-dir -r requirements.txt
