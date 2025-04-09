@@ -32,17 +32,8 @@ echo "Download completed"
 python3 -m ensurepip --upgrade
 python3 -m pip install --upgrade pip
 
-# Create and activate virtual environment
-python3 -m venv venv
-if [ ! -d "venv" ]; then
-    echo "Failed to create virtual environment"
-    exit 1
-fi
-source venv/bin/activate
-
-# Install the required packages
-#pip install --no-cache-dir -r requirements.txt
-pip install -r requirements.txt
+# Install the required packages globally
+pip install --no-cache-dir -r requirements.txt
 
 # execute python code
 python psql_create_tables_script.py --host_name ${host_name} --admin_principal_name ${admin_principal_name} --database_name ${database_name} --identity_name ${identity_name}
