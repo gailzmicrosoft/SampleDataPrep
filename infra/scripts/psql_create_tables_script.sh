@@ -28,9 +28,9 @@ curl --output "$requirementFile" "$requirementFileUrl"
 
 echo "Download completed"
 
-# Upgrade pip
-python3 -m ensurepip --upgrade
-python3 -m pip install --upgrade pip
+# # Upgrade pip
+# python3 -m ensurepip --upgrade
+# python3 -m pip install --upgrade pip
 
 # Install the required packages globally
 pip install --no-cache-dir -r requirements.txt
