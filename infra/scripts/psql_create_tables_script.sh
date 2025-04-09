@@ -28,6 +28,8 @@ curl --output "$requirementFile" "$requirementFileUrl"
 
 echo "Download completed"
 
+pip install --upgrade pip
+
 # # Upgrade pip
 # python3 -m ensurepip --upgrade
 # python3 -m pip install --upgrade pip
