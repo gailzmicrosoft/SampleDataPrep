@@ -1,0 +1,4 @@
+#generic one for postgres db
+psycopg2-binary==2.9.10
+azure-identity==1.19.0
+azure-keyvault-secrets==4.9.0
