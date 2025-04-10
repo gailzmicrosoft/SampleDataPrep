@@ -1,4 +1,7 @@
-azure-identity==1.12.0  # For DefaultAzureCredential to acquire access tokens
-psycopg2-binary==2.9.6  # For connecting to PostgreSQL
-pandas==2.1.0           # For reading and processing CSV files. Other versions: 2.2.2, 1.5.3
-
+# This file contains the requirements for loading tables in the data pipeline.
+psycopg2-binary==2.9.10
+azure-identity==1.12.0  # Downgraded to ensure compatibility from 1.19.0
+msal==1.24.0b1
+msal-extensions==1.0.0
+pandas==1.5.3 #Other versions: 2.2.2, 2.1.0, 1.5.3
+numpy==1.21.6 #Other versions: 1.24.4, 1.23.5, 1.22.4, 1.21.6
