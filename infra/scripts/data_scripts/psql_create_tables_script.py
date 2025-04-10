@@ -88,13 +88,7 @@ def main():
     try:
         # Acquire the access token
         logger.info("Acquiring access token.")
-        try:
-            cred = DefaultAzureCredential()
-            access_token = cred.get_token(ACCESS_TOKEN_SCOPE)
-        except Exception as e:
-            logger.error(f"Failed to acquire access token: {e}")
-            sys.exit(1)
-        
+        cred = DefaultAzureCredential()
         ACCESS_TOKEN_SCOPE = "https://ossrdbms-aad.database.windows.net/.default"
         access_token = cred.get_token(ACCESS_TOKEN_SCOPE)
         logger.info("Access token acquired successfully.")
