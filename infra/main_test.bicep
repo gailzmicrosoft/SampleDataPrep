@@ -459,7 +459,7 @@ module containerApp './core/host/containerapp.bicep' = {
 }
 
 
-var myBaseURL = 'https://raw.githubusercontent.com/gailzmicrosoft/TestCode/main/'
+// var myBaseURL = 'https://raw.githubusercontent.com/gailzmicrosoft/TestCode/main/'
 
 module deployPsqlScriptCreateTables './core/database/psql_create_tables_script.bicep' = if (databaseType == 'PostgreSQL') {
   name: 'main_deploy_psql_create_tables_script'
