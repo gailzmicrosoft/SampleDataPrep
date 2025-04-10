@@ -53,6 +53,19 @@ def main():
     host_name = args.host_name
     identity_name = args.identity_name
     database_name = args.database_name
+    
+    # check any of the arguments are empty or null, if so, raise an error and exit the program
+    if not basrUrl or not host_name or not identity_name or not database_name:
+        logger.error("All arguments are required: --baseUrl, --host_name, --identity_name, --database_name")
+        sys.exit(1)
+    
+    # Log the arguments
+    logger.info("Arguments received:")
+    logger.info("Base URL: %s", basrUrl)
+    logger.info("Host Name: %s", host_name)   
+    logger.info("Identity Name: %s", identity_name)
+    logger.info("Database Name: %s", database_name)
+    
     try:
         # Acquire the access token
         logger.info("Acquiring access token...")

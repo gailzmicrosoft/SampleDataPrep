@@ -76,6 +76,11 @@ def main():
     admin_principal_name = args.admin_principal_name
     identity_name = args.identity_name
     database_name = args.database_name
+    
+    # check any of the arguments are empty or null, if so, raise an error and exit the program
+    if not host_name or not admin_principal_name or not identity_name or not database_name:
+        logger.error("All arguments are required: --host_name, --admin_principal_name, --identity_name, --database_name")
+        sys.exit(1)
 
     # Log the parameters being used
     logger.info(f"Host Name: {host_name}")
