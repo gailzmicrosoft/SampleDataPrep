@@ -15,7 +15,7 @@ database_name = "postgres" # used for local testing
 basrUrl = "basrUrl_place_holder"
 admin_principal_password = "YourAdmUserPass"  # used for local testing
 # change below to your own value for local testing:
-basrUrl = "https://raw.githubusercontent.com/gailzmicrosoft/TestCode/main/infra/" # used for local testing
+basrUrl = "https://raw.githubusercontent.com/gailzmicrosoft/TestCode/main/" # used for local testing
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -74,7 +74,7 @@ def main():
 
         try:
         # Load data into the products table
-            csv_file_path_products = os.path.join(basrUrl, 'data/postgresql_db_sample_data/products.csv')
+            csv_file_path_products = os.path.join(basrUrl, 'infra/data/postgresql_db_sample_data/products.csv')
             load_table_from_csv(cursor, 'products', csv_file_path_products, 
                 ['id', 'product_name', 'price', 'category', 'brand', 'product_description'])
             conn.commit()
@@ -84,7 +84,7 @@ def main():
 
         try:
         # Load data into the customers table
-            csv_file_path_customers = os.path.join(basrUrl, 'data/postgresql_db_sample_data/customers.csv')
+            csv_file_path_customers = os.path.join(basrUrl, 'infra/data/postgresql_db_sample_data/customers.csv')
             load_table_from_csv(cursor, 'customers', csv_file_path_customers, 
                 ['id', 'first_name', 'last_name', 'gender', 'date_of_birth', 'age', 'email', 'phone', 'post_address', 'membership'])
             conn.commit()
@@ -94,7 +94,7 @@ def main():
         
         try:
         # Load data into the orders table
-            csv_file_path_orders = os.path.join(basrUrl, 'data/postgresql_db_sample_data/orders.csv')
+            csv_file_path_orders = os.path.join(basrUrl, 'infra/data/postgresql_db_sample_data/orders.csv')
             load_table_from_csv(cursor, 'orders', csv_file_path_orders, 
                 ['id', 'customer_id', 'product_id', 'quantity', 'total', 'order_date', 'customer_first_name', 'customer_last_name', 'unit_price', 'category', 'brand', 'product_description', 'return_status'])
             conn.commit()

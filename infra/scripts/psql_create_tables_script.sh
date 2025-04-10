@@ -1,11 +1,6 @@
 #!/bin/bash
 echo "started the script"
 
-
-
-# '${baseUrl} ${resourceGroup().name} ${postgreSqlServerName} ${postgresSqlEndPoint} ${postgreSqlDbName} ${adminPrincipalName} ${identityName}'
-
-
 # Variables
 
 baseUrl="$1"
@@ -33,11 +28,14 @@ curl --output "$requirementFile" "$requirementFileUrl"
 
 echo "Download completed"
 
-#pip install --upgrade pip
+pip install --upgrade pip
 
-# Install the required packages
-#pip install --no-cache-dir -r requirements.txt
-pip install -r requirements.txt
+# # Upgrade pip
+# python3 -m ensurepip --upgrade
+# python3 -m pip install --upgrade pip
+
+# Install the required packages globally
+pip install --no-cache-dir -r requirements.txt
 
 # execute python code
 python psql_create_tables_script.py --host_name ${host_name} --admin_principal_name ${admin_principal_name} --database_name ${database_name} --identity_name ${identity_name}

@@ -469,7 +469,6 @@ module deployPsqlScriptCreateTables './core/database/psql_create_tables_script.b
     baseUrl: myBaseURL
     postgreSqlServerName: postgreSqlResource.outputs.serverName
     postgresSqlEndPoint: postgreSqlResource.outputs.endPoint
-    //postgresSqlEndPoint: '${postgreSqlServerName}.postgres.database.azure.com'
     postgreSqlDbName: postgreSqlResource.outputs.dBName
     adminPrincipalName: postgreSqlResource.outputs.adminLogin
     identity:userAssignedMid.outputs.managedIdentityOutput.id
