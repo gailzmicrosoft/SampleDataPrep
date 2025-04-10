@@ -1,15 +1,10 @@
-# version 1.0 
+# version 1.1
 from azure.identity import DefaultAzureCredential
 import psycopg2
 from psycopg2 import sql
 import logging
-import sys  # Added import
-
-# the values of the parameters will be passed from the calling program
-host_name = None
-admin_principal_name = None
-identity_name = None
-database_name = None
+import sys
+import argparse  # Added for parsing command-line arguments
 
 # Configure logging
 logging.basicConfig(
@@ -18,23 +13,14 @@ logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stdout)]
 )
 
-# need to add log to console about the parameters being used
-logging.info(f"Host Name: {host_name}")
-logging.info(f"Admin Principal Name: {admin_principal_name}")
-logging.info(f"Identity Name: {identity_name}")
-logging.info(f"Database Name: {database_name}")
-
-# if any of the parameters are not set, raise an error and exit the script
-if not all([host_name, admin_principal_name, identity_name, database_name]):
-    logging.error("One or more required parameters are not set. Exiting script.")
-    sys.exit(1) 
+logger = logging.getLogger(__name__)
 
 # Grant Permission Function
 def grant_permissions(cursor, db_name, schema_name, principal_name):
     """
     Grants database and schema-level permissions to a specified principal.
     """
-    logging.info(f"Granting permissions to principal '{principal_name}' on database '{db_name}' and schema '{schema_name}'.")
+    logger.info(f"Granting permissions to principal '{principal_name}' on database '{db_name}' and schema '{schema_name}'.")
 
     # Check if the principal exists in the database
     cursor.execute(
@@ -43,7 +29,7 @@ def grant_permissions(cursor, db_name, schema_name, principal_name):
         )
     )
     if cursor.fetchone() is None:
-        logging.info(f"Principal '{principal_name}' does not exist. Creating the principal.")
+        logger.info(f"Principal '{principal_name}' does not exist. Creating the principal.")
         add_principal_user_query = sql.SQL(
             "SELECT * FROM pgaadauth_create_principal({principal}, false, false)"
         )
@@ -52,7 +38,7 @@ def grant_permissions(cursor, db_name, schema_name, principal_name):
                 principal=sql.Literal(principal_name),
             )
         )
-        logging.info(f"Principal '{principal_name}' created successfully.")
+        logger.info(f"Principal '{principal_name}' created successfully.")
 
     # Grant CONNECT on database
     grant_connect_query = sql.SQL("GRANT CONNECT ON DATABASE {database} TO {principal}")
@@ -62,7 +48,7 @@ def grant_permissions(cursor, db_name, schema_name, principal_name):
             principal=sql.Identifier(principal_name),
         )
     )
-    logging.info(f"Granted CONNECT on database '{db_name}' to '{principal_name}'.")
+    logger.info(f"Granted CONNECT on database '{db_name}' to '{principal_name}'.")
 
     # Grant SELECT, INSERT, UPDATE, DELETE on schema tables
     grant_permissions_query = sql.SQL(
@@ -74,163 +60,152 @@ def grant_permissions(cursor, db_name, schema_name, principal_name):
             principal=sql.Identifier(principal_name),
         )
     )
-    logging.info(f"Granted SELECT, INSERT, UPDATE, DELETE on all tables in schema '{schema_name}' to '{principal_name}'.")
+    logger.info(f"Granted SELECT, INSERT, UPDATE, DELETE on all tables in schema '{schema_name}' to '{principal_name}'.")
 
-# Program starts here
-logging.info("Starting the script to create tables and grant permissions.")
+def main():
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(description="Create tables and grant permissions in PostgreSQL.")
+    parser.add_argument("--host_name", required=True, help="The hostname of the PostgreSQL server.")
+    parser.add_argument("--admin_principal_name", required=True, help="The admin principal name.")
+    parser.add_argument("--identity_name", required=True, help="The identity name for database access.")
+    parser.add_argument("--database_name", required=True, help="The name of the PostgreSQL database.")
+    args = parser.parse_args()
 
-try:
-    # Acquire the access token
-    logging.info("Acquiring access token.")
-    cred = DefaultAzureCredential()
-    access_token = cred.get_token("https://ossrdbms-aad.database.windows.net/.default")
-    logging.info("Access token acquired successfully.")
+    # Assign arguments to variables
+    host_name = args.host_name
+    admin_principal_name = args.admin_principal_name
+    identity_name = args.identity_name
+    database_name = args.database_name
 
-    # Combine the token with the connection string to establish the connection.
-    logging.info("Establishing connection to the database.")
-    conn_string = "host={0} user={1} dbname={2} password={3} sslmode=require".format(
-        host_name, identity_name, database_name, access_token.token
-    )
-    conn = psycopg2.connect(conn_string)
-    cursor = conn.cursor()
-    logging.info("Connection established successfully.")
+    # Log the parameters being used
+    logger.info(f"Host Name: {host_name}")
+    logger.info(f"Admin Principal Name: {admin_principal_name}")
+    logger.info(f"Identity Name: {identity_name}")
+    logger.info(f"Database Name: {database_name}")
 
-    # Drop and recreate the products table
-    logging.info("Dropping and recreating the 'products' table.")
-    cursor.execute("DROP TABLE IF EXISTS products")
-    conn.commit()
+    logger.info("Starting the script to create tables and grant permissions.")
 
-    create_products_sql = """
-    CREATE TABLE IF NOT EXISTS products
-    (
-        id integer,
-        product_name character varying(100),
-        price numeric(10,2) NOT NULL,
-        category character varying(50),
-        brand character varying(50),
-        product_description text
-    );
-    """
-    cursor.execute(create_products_sql)
-    conn.commit()
-    logging.info("'products' table created successfully.")
+    try:
+        # Acquire the access token
+        logger.info("Acquiring access token.")
+        try:
+            cred = DefaultAzureCredential()
+            access_token = cred.get_token(ACCESS_TOKEN_SCOPE)
+        except Exception as e:
+            logger.error(f"Failed to acquire access token: {e}")
+            sys.exit(1)
+        
+        ACCESS_TOKEN_SCOPE = "https://ossrdbms-aad.database.windows.net/.default"
+        access_token = cred.get_token(ACCESS_TOKEN_SCOPE)
+        logger.info("Access token acquired successfully.")
 
-    # Drop and recreate the customers table
-    logging.info("Dropping and recreating the 'customers' table.")
-    cursor.execute("DROP TABLE IF EXISTS customers")
-    conn.commit()
+        # Combine the token with the connection string to establish the connection.
+        logger.info("Establishing connection to the database.")
+        conn_string = "host={0} user={1} dbname={2} password={3} sslmode=require".format(
+            host_name, identity_name, database_name, access_token.token
+        )
+        conn = psycopg2.connect(conn_string)
+        cursor = conn.cursor()
+        logger.info("Connection established successfully.")
 
-    create_customers_sql = """
-    CREATE TABLE customers
-    (
-        id integer,
-        first_name character varying(50),
-        last_name character varying(50),
-        gender character varying(10),
-        date_of_birth date,
-        age integer,
-        email character varying(100),
-        phone character varying(20),
-        post_address character varying(255),
-        membership character varying(50)
-    );
-    """
-    cursor.execute(create_customers_sql)
-    conn.commit()
-    logging.info("'customers' table created successfully.")
-
-    # Drop and recreate the orders table
-    logging.info("Dropping and recreating the 'orders' table.")
-    cursor.execute("DROP TABLE IF EXISTS orders")
-    conn.commit()
-
-    create_orders_sql = """
-    CREATE TABLE orders
-    (
-        id integer,
-        customer_id integer,
-        customer_first_name character varying(50),
-        customer_last_name character varying(50),
-        customer_gender character varying(10),
-        customer_age integer,
-        customer_email character varying(100),
-        customer_phone character varying(20),
-        order_date date,
-        product_id integer,
-        product_name character varying(100),
-        quantity integer,
-        unit_price numeric(10,2),
-        total numeric(10,2),
-        category character varying(50),
-        brand character varying(50),
-        product_description text,
-        return_status BOOLEAN DEFAULT FALSE
-    );
-    """
-    cursor.execute(create_orders_sql)
-    conn.commit()
-    logging.info("'orders' table created successfully.")
-
-    # Add Vector extension
-    logging.info("Adding 'vector' extension.")
-    cursor.execute("CREATE EXTENSION IF NOT EXISTS vector CASCADE;")
-    conn.commit()
-
-    logging.info("Dropping and recreating the 'vector_store' table.")
-    cursor.execute("DROP TABLE IF EXISTS vector_store;")
-    conn.commit()
-
-    create_vs_sql = """
-    CREATE TABLE IF NOT EXISTS vector_store(
-        id text,
-        title text,
-        chunk integer,
-        chunk_id text,
-        "offset" integer,
-        page_number integer,
-        content text,
-        source text,
-        metadata text,
-        content_vector public.vector(1536)
-    );
-    """
-    cursor.execute(create_vs_sql)
-    conn.commit()
-    logging.info("'vector_store' table created successfully.")
-
-    cursor.execute(
-        "CREATE INDEX vector_store_content_vector_idx ON vector_store USING hnsw (content_vector vector_cosine_ops);"
-    )
-    conn.commit()
-    logging.info("Index on 'vector_store' table created successfully.")
-
-    # Grant permissions to the admin principal if provided
-    if admin_principal_name and admin_principal_name.strip():
-        logging.info(f"Granting permissions to admin principal '{admin_principal_name}'.")
-        grant_permissions(cursor, database_name, "public", admin_principal_name)
+        # Drop and recreate the products table
+        logger.info("Dropping and recreating the 'products' table.")
+        cursor.execute("DROP TABLE IF EXISTS public.products")
         conn.commit()
 
-    # Grant permissions to the additional principal if provided
-    if identity_name and identity_name.strip():
-        logging.info(f"Granting permissions to identity '{identity_name}'.")
-        grant_permissions(cursor, database_name, "public", identity_name)
+        create_products_sql = """
+        CREATE TABLE IF NOT EXISTS public.products
+        (
+            id integer,
+            product_name character varying(100),
+            price numeric(10,2) NOT NULL,
+            category character varying(50),
+            brand character varying(50),
+            product_description text
+        );
+        """
+        cursor.execute(create_products_sql)
+        conn.commit()
+        logger.info("'products' table created successfully.")
+
+        # Drop and recreate the customers table
+        logger.info("Dropping and recreating the 'customers' table.")
+        cursor.execute("DROP TABLE IF EXISTS public.customers")
         conn.commit()
 
-    # Set default privileges for future tables in the public schema
-    logging.info("Setting default privileges for future tables in the 'public' schema.")
-    cursor.execute("""
-        ALTER DEFAULT PRIVILEGES IN SCHEMA public
-        GRANT ALL PRIVILEGES ON TABLES TO azure_pg_admin;
-    """)
-    conn.commit()
-    logging.info("Default privileges set successfully.")
+        create_customers_sql = """
+        CREATE TABLE IF NOT EXISTS public.customers
+        (
+            id integer,
+            first_name character varying(50),
+            last_name character varying(50),
+            gender character varying(10),
+            date_of_birth date,
+            age integer,
+            email character varying(100),
+            phone character varying(20),
+            post_address character varying(255),
+            membership character varying(50)
+        );
+        """
+        cursor.execute(create_customers_sql)
+        conn.commit()
+        logger.info("'customers' table created successfully.")
 
-except Exception as e:
-    logging.error(f"An error occurred: {e}")
-    raise
-finally:
-    if cursor:
-        cursor.close()
-    if conn:
-        conn.close()
-    logging.info("Database connection closed.")
+        # Drop and recreate the orders table
+        logger.info("Dropping and recreating the 'orders' table.")
+        cursor.execute("DROP TABLE IF EXISTS public.orders")
+        conn.commit()
+
+        create_orders_sql = """
+        CREATE TABLE IF NOT EXISTS public.orders
+        (
+            id integer,
+            customer_id integer,
+            customer_first_name character varying(50),
+            customer_last_name character varying(50),
+            customer_gender character varying(10),
+            customer_age integer,
+            customer_email character varying(100),
+            customer_phone character varying(20),
+            order_date date,
+            product_id integer,
+            product_name character varying(100),
+            quantity integer,
+            unit_price numeric(10,2),
+            total numeric(10,2),
+            category character varying(50),
+            brand character varying(50),
+            product_description text,
+            return_status BOOLEAN DEFAULT FALSE
+        );
+        """
+        cursor.execute(create_orders_sql)
+        conn.commit()
+        logger.info("'orders' table created successfully.")
+
+        # Grant permissions to the admin principal if provided
+        if admin_principal_name and admin_principal_name.strip():
+            logger.info(f"Granting permissions to admin principal '{admin_principal_name}'.")
+            grant_permissions(cursor, database_name, "public", admin_principal_name)
+            conn.commit()
+
+        # Grant permissions to the additional principal if provided
+        if identity_name and identity_name.strip():
+            logger.info(f"Granting permissions to identity '{identity_name}'.")
+            grant_permissions(cursor, database_name, "public", identity_name)
+            conn.commit()
+
+    except Exception as e:
+        logger.error(f"An error occurred: {e}")
+        raise
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+        logger.info("Database connection closed.")
+
+# Entry point
+if __name__ == "__main__":
+    main()

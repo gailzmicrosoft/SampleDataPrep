@@ -5,18 +5,15 @@ from psycopg2 import sql
 import os
 import pandas as pd
 import logging
-import sys  # Added import
-
-# Configuration parameters
-key_vault_name = "key_vault_name_place_holder"
-host_name = "host_name_place_holder"
-admin_principal_name = "admin_principal_name_place_holder"
-identity_name = "identity_name_place_holder"
-database_name = "database_name_place_holder"
-basrUrl = "basrUrl_place_holder"
+import sys  
+import argparse  # Added for parsing command-line arguments
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[logging.StreamHandler(sys.stdout)])
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[logging.StreamHandler(sys.stdout)]
+)
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +40,19 @@ def load_table_from_csv(cursor, table_name, csv_file_path, columns):
     logger.info("Data loaded into %s table.", table_name)
 
 def main():
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(description="Create tables and grant permissions in PostgreSQL.")
+    parser.add_argument("--baseUrl", required=True, help="BaseUrl of the GitHub Repo.")
+    parser.add_argument("--host_name", required=True, help="The hostname of the PostgreSQL server.")
+    parser.add_argument("--identity_name", required=True, help="The identity name for database access.")
+    parser.add_argument("--database_name", required=True, help="The name of the PostgreSQL database.")
+    args = parser.parse_args()
+
+    # Assign arguments to variables
+    basrUrl = args.basrUrl
+    host_name = args.host_name
+    identity_name = args.identity_name
+    database_name = args.database_name
     try:
         # Acquire the access token
         logger.info("Acquiring access token...")
