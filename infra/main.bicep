@@ -475,4 +475,3 @@ module deployPsqlScriptCreateTables './core/database/psql_create_tables_script.b
     identityName: userAssignedMid.outputs.managedIdentityOutput.name
   }
 }
-
