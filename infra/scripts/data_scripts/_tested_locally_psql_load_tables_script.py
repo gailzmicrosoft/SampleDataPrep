@@ -5,16 +5,20 @@ from psycopg2 import sql
 import os
 import pandas as pd
 import logging
-import sys  
-import argparse  # Added for parsing command-line arguments
+
+# Configuration parameters
+key_vault_name = "key_vault_name_place_holder"
+host_name = "yourserver.postgres.database.azure.com" # used for local testing
+admin_principal_name = "yourAdmUserName" # used for local testing
+identity_name = "identity_name_place_holder"
+database_name = "postgres" # used for local testing
+basrUrl = "basrUrl_place_holder"
+admin_principal_password = "YourAdmUserPass"  # used for local testing
+# change below to your own value for local testing:
+basrUrl = "https://raw.githubusercontent.com/gailzmicrosoft/TestCode/main/" # used for local testing
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[logging.StreamHandler(sys.stdout)]
-)
-
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 def truncate_tables(cursor, tables):
@@ -40,32 +44,19 @@ def load_table_from_csv(cursor, table_name, csv_file_path, columns):
     logger.info("Data loaded into %s table.", table_name)
 
 def main():
-    # Parse command-line arguments
-    parser = argparse.ArgumentParser(description="Create tables and grant permissions in PostgreSQL.")
-    parser.add_argument("--baseUrl", required=True, help="BaseUrl of the GitHub Repo.")
-    parser.add_argument("--host_name", required=True, help="The hostname of the PostgreSQL server.")
-    parser.add_argument("--identity_name", required=True, help="The identity name for database access.")
-    parser.add_argument("--database_name", required=True, help="The name of the PostgreSQL database.")
-    args = parser.parse_args()
-
-    # Assign arguments to variables
-    basrUrl = args.basrUrl
-    host_name = args.host_name
-    identity_name = args.identity_name
-    database_name = args.database_name
     try:
         # Acquire the access token
         logger.info("Acquiring access token...")
         cred = DefaultAzureCredential()
         access_token = cred.get_token("https://ossrdbms-aad.database.windows.net/.default")
         logger.info("Access token acquired.")
-        #password = access_token.token
-      
+        
         # Combine the token with the connection string to establish the connection.
         logger.info("Establishing database connection...")
         conn_string = (
             "host={0} user={1} dbname={2} password={3} sslmode=require".format(
-                host_name, identity_name, database_name, access_token.token
+        #       host_name, identity_name, database_name, access_token.token
+               host_name, admin_principal_name, database_name, admin_principal_password
             )
         )
         
