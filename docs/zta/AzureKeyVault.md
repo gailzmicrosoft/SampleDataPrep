@@ -1,6 +1,6 @@
 # Implementing Zero Trust Architecture for Azure Key Vault
 
-Draft 
+<Draft> 
 This guide outlines the key requirements and best practices for implementing Zero Trust Architecture for Azure Key Vault. The focus is on applying principles of least privilege, strong authentication, network segmentation, and continuous monitoring to securely manage secrets, certificates, and encryption keys.
 
 ---
