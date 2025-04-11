@@ -1,5 +1,6 @@
 # Zero Trust Architecture Framework for Azure Applications
 
+<Draft>
 This guide outlines a comprehensive framework for implementing Zero Trust Architecture for Azure-based applications. The focus is on securing resources such as Azure Storage, Azure Container Apps, Azure PostgreSQL, Azure SQL DB, Azure Cosmos DB, Azure Search, Azure Open AI, and Azure Cognitive Services by applying principles of least privilege, strong authentication, network segmentation, and continuous monitoring.
 
 ---
