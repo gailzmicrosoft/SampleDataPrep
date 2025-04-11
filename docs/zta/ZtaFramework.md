@@ -107,7 +107,7 @@ Refer to below document for requirement for specific azure resources:
 
 1. [Azure Storage](./AzureStorage.md)
 2. [Azure Container App](./ContainerApp.md)
-3. [Azure PostgreSQL](.PostgreSQL.md)
+3. [Azure PostgreSQL](./PostgreSQL.md)
 4. [Azure Key Vault](./AzureKeyVault.md)
 5. [Azure Virtual Machine](./AzureVM.md)
 
