@@ -1,5 +1,6 @@
 # Implementing Zero Trust Architecture for Azure Virtual Machines (VMs)
 
+Draft 
 This guide outlines the key requirements and best practices for implementing Zero Trust Architecture for Azure Virtual Machines (VMs). The focus is on applying principles of least privilege, strong authentication, network segmentation, and continuous monitoring.
 
 **Key Features of This Document**
