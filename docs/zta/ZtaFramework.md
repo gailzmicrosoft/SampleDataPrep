@@ -1,7 +1,7 @@
 # Zero Trust Architecture Framework for Azure Applications
 
 <Draft>
-This guide outlines a comprehensive framework for implementing Zero Trust Architecture for Azure-based applications. The focus is on securing resources such as Azure Storage, Azure Container Apps, Azure PostgreSQL, Azure SQL DB, Azure Cosmos DB, Azure Search, Azure Open AI, and Azure Cognitive Services by applying principles of least privilege, strong authentication, network segmentation, and continuous monitoring.
+This guide outlines a simple framework for implementing Zero Trust Architecture for Azure-based applications by applying principles of least privilege, strong authentication, network segmentation, and continuous monitoring. More references are provided for securing resources such as Azure Storage, Azure Container Apps, and Azure PostgreSQL. Additional Azure Resources will be added to the References. 
 
 ---
 
@@ -9,6 +9,14 @@ This guide outlines a comprehensive framework for implementing Zero Trust Archit
 1. **Verify Explicitly**: Always authenticate and authorize based on all available data points (e.g., user identity, location, device health, service identity).
 2. **Use Least Privilege Access**: Limit access to only what is necessary for users, applications, and services.
 3. **Assume Breach**: Design the architecture as if the network is already compromised.
+
+## **Key Concepts for Implementation**
+
+1. **Start with Identity**: Secure all resources with Azure AD and managed identities.
+2. **Segment the Network**: Use VNets, NSGs, and private endpoints to isolate resources.
+3. **Encrypt Everything**: Ensure encryption at rest and in transit for all data.
+4. **Monitor Continuously**: Use Azure Monitor, Defender, and Sentinel for real-time insights.
+5. **Automate Compliance**: Use Azure Policy and IaC to enforce security configurations.
 
 ---
 
@@ -93,43 +101,13 @@ This guide outlines a comprehensive framework for implementing Zero Trust Archit
 
 ---
 
-## **Resource-Specific Zero Trust Configurations**
+## References 
 
-### **1. Azure Storage**
-- Disable public access and shared key authentication.
-- Use private endpoints and VNet integration.
-- Store secrets in Azure Key Vault.
+Refer to below document for requirement for specific azure resources: 
 
-### **2. Azure Container Apps**
-- Disable public ingress and use private endpoints.
-- Store sensitive information in Azure Key Vault.
-- Enable Azure Defender for Containers.
-
-### **3. Azure PostgreSQL and SQL DB**
-- Enforce SSL connections.
-- Use private endpoints and firewall rules.
-- Enable automated backups and point-in-time restore.
-
-### **4. Azure Cosmos DB**
-- Enable private endpoints and disable public access.
-- Use RBAC for granular access control.
-- Enable Azure Defender for Cosmos DB.
-
-### **5. Azure Open AI and Cognitive Services**
-- Use private endpoints for secure access.
-- Restrict access using Azure AD and RBAC.
-- Monitor usage with Azure Monitor.
-
----
-
-## **Key Concepts for Implementation**
-1. **Start with Identity**: Secure all resources with Azure AD and managed identities.
-2. **Segment the Network**: Use VNets, NSGs, and private endpoints to isolate resources.
-3. **Encrypt Everything**: Ensure encryption at rest and in transit for all data.
-4. **Monitor Continuously**: Use Azure Monitor, Defender, and Sentinel for real-time insights.
-5. **Automate Compliance**: Use Azure Policy and IaC to enforce security configurations.
-
----
-
-By following this framework, you can implement a comprehensive Zero Trust Application Architecture for your solution, ensuring secure and compliant access to all resources.
+1. [Azure Storage](./AzureStorage.md)
+2. [Azure Container App](./ContainerApp.md)
+3. [Azure PostgreSQL](.PostgreSQL.md)
+4. [Azure Key Vault](./AzureKeyVault.md)
+5. [Azure Virtual Machine](./AzureVM.md)
 
