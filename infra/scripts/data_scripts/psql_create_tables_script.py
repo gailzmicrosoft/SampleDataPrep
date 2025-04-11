@@ -76,6 +76,11 @@ def main():
     admin_principal_name = args.admin_principal_name
     identity_name = args.identity_name
     database_name = args.database_name
+    
+    # check any of the arguments are empty or null, if so, raise an error and exit the program
+    if not host_name or not admin_principal_name or not identity_name or not database_name:
+        logger.error("All arguments are required: --host_name, --admin_principal_name, --identity_name, --database_name")
+        sys.exit(1)
 
     # Log the parameters being used
     logger.info(f"Host Name: {host_name}")
@@ -88,13 +93,7 @@ def main():
     try:
         # Acquire the access token
         logger.info("Acquiring access token.")
-        try:
-            cred = DefaultAzureCredential()
-            access_token = cred.get_token(ACCESS_TOKEN_SCOPE)
-        except Exception as e:
-            logger.error(f"Failed to acquire access token: {e}")
-            sys.exit(1)
-        
+        cred = DefaultAzureCredential()
         ACCESS_TOKEN_SCOPE = "https://ossrdbms-aad.database.windows.net/.default"
         access_token = cred.get_token(ACCESS_TOKEN_SCOPE)
         logger.info("Access token acquired successfully.")

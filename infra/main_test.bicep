@@ -476,3 +476,20 @@ module deployPsqlScriptCreateTables './core/database/psql_create_tables_script.b
   }
 }
 
+
+// // under testing 
+// // The Azure CLI script was not able to run the scripts in its container app. 
+// // It failed after more than 1 hour of waiting for the script to run.
+// module deployPsqlScriptLoadTables './core/database/psql_load_tables_script.bicep' = if (databaseType == 'PostgreSQL') {
+//   name: 'main_deploy_psql_load_tables_script'
+//   scope: rg
+//   params: {
+//     location: location
+//     baseUrl: myBaseURL
+//     postgreSqlServerName: postgreSqlResource.outputs.serverName
+//     postgresSqlEndPoint: postgreSqlResource.outputs.endPoint
+//     postgreSqlDbName: postgreSqlResource.outputs.dBName
+//     identity:userAssignedMid.outputs.managedIdentityOutput.id
+//     identityName: userAssignedMid.outputs.managedIdentityOutput.name
+//   }
+// }
