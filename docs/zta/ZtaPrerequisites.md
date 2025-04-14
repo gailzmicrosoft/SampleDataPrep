@@ -43,7 +43,7 @@ In addition, organizations have established below secure foundations in Azure:
 
 5. **Well-Architected Framework**:
    - Have followed the **Azure Well-Architected Framework** to ensure best practices for reliability, security, cost optimization, operational excellence, and performance efficiency.
-   - Reference: [Azure Well-Architected Framework](https://learn.microsoft.com/en-us/azure/well-architected/)
+   - Reference: [Azure Well-Architected Framework](https://learn.microsoft.com/en-us/azure/well-architected/what-is-well-architected-framework)
 
 6. **Compliance Requirements**:
    - Have identified and implemented compliance requirements (e.g., GDPR, HIPAA, ISO 27001) using Azure Policy and Microsoft Compliance Manager.
