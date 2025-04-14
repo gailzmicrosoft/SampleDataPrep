@@ -63,7 +63,7 @@ It is assumed that your organizations have established foundations for develop a
 
 ---
 
-### 3. Storage and Database Security 
+### **3. Storage and Database Security** 
 
 - **Storage Access:** No anonymous public access, no key-based client     access. Implement private end point. 
 - **Storage Protection:** Enable Microsoft Defender for Storage 
@@ -75,6 +75,7 @@ It is assumed that your organizations have established foundations for develop a
   - Enable **point-in-time restore** for critical data.
 - **Encryption**:     Ensure that data is encrypted both at rest and in transit.
 
+---
 ### **4. Data Protection**
 
 - **Encryption**:
@@ -86,13 +87,15 @@ It is assumed that your organizations have established foundations for develop a
 
 ---
 
-### 4. Application Security and SDLC
+### **5. Application Security and SDLC**
 
 - **Secure Development Lifecycle (SDLC)**: Integrate security into the development     lifecycle to identify and mitigate vulnerabilities early.
 - **Application Identity**: Set up application identity and grant necessary     privileges during deployment and initial set up. 
 - **Sensitive Information Management**: Use Azure Key Vault to store all sensitive information including end points and keys. Do not use environment variables to store keys or end points that can be easily stored and retrieved from Azure Key Vault. Use managed identity to access Key Vault. 
 
-### **5. Monitoring and Threat Detection**
+---
+
+### **6. Monitoring and Threat Detection**
 
 - **Azure Monitor**:
   - Enable **Azure Monitor** to collect metrics and logs for all resources.
@@ -109,7 +112,7 @@ It is assumed that your organizations have established foundations for develop a
 
 ---
 
-### **6. Automation and Governance**
+### **7. Automation and Governance**
 - **Infrastructure as Code (IaC)**:
   - Use **Bicep** or **Terraform** to define and deploy secure configurations for all resources.
   - Include security configurations (e.g., private endpoints, RBAC) in the IaC templates.
