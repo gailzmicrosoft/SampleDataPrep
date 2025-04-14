@@ -30,8 +30,7 @@ In addition, organizations have established below secure foundations in Azure:
    - Azure Management Groups for hierarchical organization.
    - Azure Blueprints for consistent resource deployment.
    - Azure Policy for compliance enforcement.
-
-   - Reference: [Azure Governance | Microsoft Learn](vscode-file://vscode-app/c:/Users/gazho/AppData/Local/Programs/Microsoft VS Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html)
+   - Reference: [Azure governance documentation | Microsoft Learn](https://learn.microsoft.com/en-us/azure/governance/)
 
 4. **Zero Trust Principles**:
 
@@ -41,19 +40,23 @@ In addition, organizations have established below secure foundations in Azure:
    - Enforcing least privilege access.
    - Assuming breach and designing systems accordingly.
 
-   Reference: [Zero Trust Overview | Microsoft Learn](vscode-file://vscode-app/c:/Users/gazho/AppData/Local/Programs/Microsoft VS Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html)
+   Reference:[What is Zero Trust? | Microsoft Learn](https://learn.microsoft.com/en-us/security/zero-trust/zero-trust-overview)
 
 5. **Well-Architected Framework**:
 
    Have followed the **Azure Well-Architected Framework** to ensure best practices for reliability, security, cost optimization, operational excellence, and performance efficiency.
 
-   - Reference: [Azure Well-Architected Framework | Microsoft Learn](vscode-file://vscode-app/c:/Users/gazho/AppData/Local/Programs/Microsoft VS Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html)
+   - Reference: [Azure Well-Architected Framework - Microsoft Azure Well-Architected Framework | Microsoft Learn](https://learn.microsoft.com/en-us/azure/well-architected/)
 
 6. **Compliance Requirements**:
 
    Have identified and implemented compliance requirements (e.g., GDPR, HIPAA, ISO 27001) using Azure Policy and Microsoft Compliance Manager.
 
-   - Reference: [Azure Compliance Documentation | Microsoft Learn](vscode-file://vscode-app/c:/Users/gazho/AppData/Local/Programs/Microsoft VS Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html)
+   References:
+
+   -  [Azure compliance documentation | Microsoft Learn](https://learn.microsoft.com/en-us/azure/compliance/)
+   - [Azure Policy documentation | Microsoft Learn](https://learn.microsoft.com/en-us/azure/governance/policy/)
+   - [Azure Blueprints documentation | Microsoft Learn](https://learn.microsoft.com/en-us/azure/governance/blueprints/)
 
 7. **Security Baseline**:
 
@@ -67,6 +70,4 @@ In addition, organizations have established below secure foundations in Azure:
 
    Have integrated **DevSecOps** practices into their development lifecycle, ensuring security is embedded into CI/CD pipelines.
 
-   - Reference: [DevSecOps in Azure | Microsoft Learn](vscode-file://vscode-app/c:/Users/gazho/AppData/Local/Programs/Microsoft VS Code/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html)
-
-
+   - Reference: [Security in DevOps (DevSecOps) - Azure DevOps | Microsoft Learn](https://learn.microsoft.com/en-us/devops/operate/security-in-devops)
