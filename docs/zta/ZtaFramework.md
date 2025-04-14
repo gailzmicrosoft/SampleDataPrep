@@ -6,11 +6,11 @@
 
 [What is Zero Trust? | Microsoft Learn](https://learn.microsoft.com/en-us/security/zero-trust/zero-trust-overview)
 
-[Zero Trust deployment plan with Microsoft 365 | Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/microsoft-365-zero-trust?view=o365-worldwide&bc=%2Fsecurity%2Fzero-trust%2Fbreadcrumb%2Ftoc.json&toc=%2Fsecurity%2Fzero-trust%2Ftoc.json)
-
 **Assumptions and Prerequisites** 
 
-It is assumed that your organizations have established foundations for develop and deploy zero trust architecture or applications. Refer to [Assumptions and Prerequisites for ZTA](./ZtaPrerequisites.md) Then you can use this guide and framework to implement Zero Trust Architecture for Azure-based applications by applying principles of least privilege, strong authentication, network segmentation, and continuous monitoring. 
+It is assumed that your organizations have established foundations for develop and deploy zero trust architecture or applications: 
+
+[Assumptions and Prerequisites for ZTA](./ZtaPrerequisites.md) 
 
 ---
 
