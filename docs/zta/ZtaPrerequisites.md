@@ -13,7 +13,7 @@ In addition, organizations have established below secure foundations in Azure:
    - Resource organization and governance.
    - Security, compliance, and monitoring.  
 
- Reference: [Azure landing zone](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/landing-zone/)
+   Reference: [Azure landing zone](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/landing-zone/)
 
 2. **Azure Infrastructure Setup**:
 
