@@ -1,7 +1,16 @@
 # Zero Trust Architecture Framework for Azure Applications
 
 <Draft>
-This guide outlines a simple framework for implementing Zero Trust Architecture for Azure-based applications by applying principles of least privilege, strong authentication, network segmentation, and continuous monitoring. More references are provided for securing resources such as Azure Storage, Azure Container Apps, and Azure PostgreSQL. Additional Azure Resources will be added to the References. 
+
+**Zero Trust Principles and References**
+
+[What is Zero Trust? | Microsoft Learn](https://learn.microsoft.com/en-us/security/zero-trust/zero-trust-overview)
+
+[Zero Trust deployment plan with Microsoft 365 | Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/microsoft-365-zero-trust?view=o365-worldwide&bc=%2Fsecurity%2Fzero-trust%2Fbreadcrumb%2Ftoc.json&toc=%2Fsecurity%2Fzero-trust%2Ftoc.json)
+
+**Assumptions and Prerequisites** 
+
+It is assumed that your organizations have established foundations for develop and deploy zero trust architecture or applications. Refer to [Assumptions and Prerequisites for ZTA](./ZtaPrerequisites.md) Then you can use this guide and framework to implement Zero Trust Architecture for Azure-based applications by applying principles of least privilege, strong authentication, network segmentation, and continuous monitoring. 
 
 ---
 
@@ -54,22 +63,37 @@ This guide outlines a simple framework for implementing Zero Trust Architecture 
 
 ---
 
-### **3. Data Protection**
+### 3. Storage and Database Security 
+
+- **Storage Access:** No anonymous public access, no key-based client     access. Implement private end point. 
+- **Storage Protection:** Enable Microsoft Defender for Storage 
+- **Immutable Storage**: Enable **immutable storage policies** for critical data to prevent tampering or deletion.
+- **Database Access**: Setup private end point access, set up managed identity as     principal for initial database administration. 
+- **Data Loss Prevention (DLP)**: Use DLP solutions to prevent unauthorized     access and sharing of sensitive data.
+- **Backup and Recovery**:
+  - Configure **automated backups** for databases (e.g., PostgreSQL, SQL DB, Cosmos DB).
+  - Enable **point-in-time restore** for critical data.
+- **Encryption**:     Ensure that data is encrypted both at rest and in transit.
+
+### **4. Data Protection**
+
 - **Encryption**:
   - Enable **encryption at rest** for all resources using **Microsoft-managed keys** or **customer-managed keys (CMK)** in Azure Key Vault.
   - Enforce **encryption in transit** by requiring HTTPS or SSL/TLS for all connections.
 - **Azure Key Vault**:
   - Store secrets, certificates, and encryption keys in **Azure Key Vault**.
   - Use **Key Vault Access Policies** or **Azure RBAC** to control access.
-- **Immutable Storage**:
-  - Enable **immutable storage policies** for critical data to prevent tampering or deletion.
-- **Backup and Recovery**:
-  - Configure **automated backups** for databases (e.g., PostgreSQL, SQL DB, Cosmos DB).
-  - Enable **point-in-time restore** for critical data.
 
 ---
 
-### **4. Monitoring and Threat Detection**
+### 4. Application Security and SDLC
+
+- **Secure Development Lifecycle (SDLC)**: Integrate security into the development     lifecycle to identify and mitigate vulnerabilities early.
+- **Application Identity**: Set up application identity and grant necessary     privileges during deployment and initial set up. 
+- **Sensitive Information Management**: Use Azure Key Vault to store all sensitive information including end points and keys. Do not use environment variables to store keys or end points that can be easily stored and retrieved from Azure Key Vault. Use managed identity to access Key Vault. 
+
+### **5. Monitoring and Threat Detection**
+
 - **Azure Monitor**:
   - Enable **Azure Monitor** to collect metrics and logs for all resources.
   - Send logs to a **Log Analytics Workspace** for centralized monitoring.
@@ -85,7 +109,7 @@ This guide outlines a simple framework for implementing Zero Trust Architecture 
 
 ---
 
-### **5. Automation and Governance**
+### **6. Automation and Governance**
 - **Infrastructure as Code (IaC)**:
   - Use **Bicep** or **Terraform** to define and deploy secure configurations for all resources.
   - Include security configurations (e.g., private endpoints, RBAC) in the IaC templates.
@@ -101,7 +125,7 @@ This guide outlines a simple framework for implementing Zero Trust Architecture 
 
 ---
 
-## References 
+## Detailed Guidance for Implementation 
 
 Refer to below document for requirement for specific azure resources: 
 
