@@ -1,14 +1,12 @@
 ## **Prerequisites for ZTA**
 
-It is assumed that organizations have already established below foundations to build and deploy zero trust architectures. For example, the organizations have implemented Microsoft 365 using [Zero Trust deployment plan with Microsoft 365 | Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/microsoft-365-zero-trust?view=o365-worldwide&bc=%2Fsecurity%2Fzero-trust%2Fbreadcrumb%2Ftoc.json&toc=%2Fsecurity%2Fzero-trust%2Ftoc.json), or equivalent. 
+It is assumed that organizations have already established below foundations to build and deploy zero trust architectures. For example, the organizations have implemented Microsoft 365 using [Zero Trust deployment plan with Microsoft 365 | Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/microsoft-365-zero-trust?view=o365-worldwide&bc=%2Fsecurity%2Fzero-trust%2Fbreadcrumb%2Ftoc.json&toc=%2Fsecurity%2Fzero-trust%2Ftoc.json) or equivalent. 
 
 In addition, organizations have established below secure foundations in Azure:
 
-## **Prerequisites for ZTA**
+## **Prerequisites for ZTA in Azure**
 
-It is assumed that organizations have already established below foundations to build and deploy zero trust architectures. For example, the organizations have implemented Microsoft 365 using [Zero Trust deployment plan with Microsoft 365 | Microsoft Learn](https://learn.microsoft.com/en-us/microsoft-365/security/microsoft-365-zero-trust?view=o365-worldwide), or equivalent.
-
-In addition, organizations have established below secure foundations in Azure:
+It is assumed that organizations have established below secure foundations in Azure to enable the development and deployment of Azure Applications: 
 
 1. **Azure Landing Zones and Infrastructure Setup**:
    - Have implemented **Azure Landing Zones** as part of the cloud adoption framework, which includes the foundational infrastructure setup. This ensures:
@@ -32,7 +30,8 @@ In addition, organizations have established below secure foundations in Azure:
      - Azure Policy for compliance enforcement.
    - Reference: [Azure governance documentation | Microsoft Learn](https://learn.microsoft.com/en-us/azure/governance/)
 4. **Well-Architected Framework**:
-   - Have followed the **Azure Well-Architected Framework** to ensure best practices for reliability, security, cost optimization, operational excellence, and performance efficiency.
+   - Have followed the **Azure Well-Architected Framework (WAF)** to ensure best practices for reliability, security, cost optimization, operational excellence, and performance efficiency.
+   - Have established best practices  and processes to implement the security pillar defined by Azure WAF: [Security design principles - Microsoft Azure Well-Architected Framework | Microsoft Learn](https://learn.microsoft.com/en-us/azure/well-architected/security/principles). The principles include zero trust model, and the security principles of **confidentiality**, **integrity**, and **availability**, also known as the *CIA Triad*.
    - Reference: [Azure Well-Architected Framework](https://learn.microsoft.com/en-us/azure/well-architected/what-is-well-architected-framework)
 6. **Security Baseline**:
    - Have established a security baseline for Azure resources, including:
