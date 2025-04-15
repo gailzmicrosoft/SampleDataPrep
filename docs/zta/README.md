@@ -6,11 +6,9 @@
 
 [What is Zero Trust? | Microsoft Learn](https://learn.microsoft.com/en-us/security/zero-trust/zero-trust-overview)
 
-**Assumptions and Prerequisites** 
+**Prerequisites** 
 
-It is assumed that your organizations have established foundations for develop and deploy zero trust architecture or applications: 
-
-[Assumptions and Prerequisites for ZTA](./ZtaPrerequisites.md) 
+It is assumed that customer organizations have established foundations for develop and deploy zero trust architecture or applications: [Prerequisites for ZTA](./ZtaPrerequisites.md) 
 
 ---
 
@@ -25,7 +23,7 @@ It is assumed that your organizations have established foundations for develop a
 2. **Segment the Network**: Use VNets, NSGs, and private endpoints to isolate resources.
 3. **Encrypt Everything**: Ensure encryption at rest and in transit for all data.
 4. **Monitor Continuously**: Use Azure Monitor, Defender, and Sentinel for real-time insights.
-5. **Automate Compliance**: Use Azure Policy and IaC to enforce security configurations.
+5. **Automate Security Configurations**: Use Azure Policy and IaC to enforce security configurations.
 
 ---
 
@@ -68,12 +66,12 @@ It is assumed that your organizations have established foundations for develop a
 - **Storage Access:** No anonymous public access, no key-based client     access. Implement private end point. 
 - **Storage Protection:** Enable Microsoft Defender for Storage 
 - **Immutable Storage**: Enable **immutable storage policies** for critical data to prevent tampering or deletion.
-- **Database Access**: Setup private end point access, set up managed identity as     principal for initial database administration. 
-- **Data Loss Prevention (DLP)**: Use DLP solutions to prevent unauthorized     access and sharing of sensitive data.
+- **Database Access**: Setup private end point access, set up managed identity as principal for initial database administration. 
+- **Data Loss Prevention (DLP)**: Use DLP solutions to prevent unauthorized access and sharing of sensitive data.
 - **Backup and Recovery**:
   - Configure **automated backups** for databases (e.g., PostgreSQL, SQL DB, Cosmos DB).
   - Enable **point-in-time restore** for critical data.
-- **Encryption**:     Ensure that data is encrypted both at rest and in transit.
+- **Encryption**: Ensure that data is encrypted both at rest and in transit.
 
 ---
 ### **4. Data Protection**
@@ -89,7 +87,7 @@ It is assumed that your organizations have established foundations for develop a
 
 ### **5. Application Security and SDLC**
 
-- **Secure Development Lifecycle (SDLC)**: Integrate security into the development     lifecycle to identify and mitigate vulnerabilities early.
+- **Secure Development Lifecycle (SDLC)**: Integrate security into the development lifecycle to identify and mitigate vulnerabilities early.
 - **Application Identity**: Set up application identity and grant necessary     privileges during deployment and initial set up. 
 - **Sensitive Information Management**: Use Azure Key Vault to store all sensitive information including end points and keys. Do not use environment variables to store keys or end points that can be easily stored and retrieved from Azure Key Vault. Use managed identity to access Key Vault. 
 
@@ -128,7 +126,7 @@ It is assumed that your organizations have established foundations for develop a
 
 ---
 
-## Detailed Guidance for Implementation 
+## Guidance for Specific Resources 
 
 Refer to below document for requirement for specific azure resources: 
 
