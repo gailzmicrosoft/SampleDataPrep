@@ -8,7 +8,8 @@ In addition, organizations have established below secure foundations in Azure:
 
 It is assumed that organizations have established below secure foundations in Azure to enable the development and deployment of Azure Applications: 
 
-1. **Azure Landing Zones and Infrastructure Setup**:
+1. **Azure Infrastructure Setup and Azure Landing Zones**:
+   - Have set up cloud infrastructure with best practices and design described in Microsoft Cloud Adoption Framework (CAF) in Azure: [Microsoft Cloud Adoption Framework for Azure documentation - Cloud Adoption Framework | Microsoft Learn](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/overview).
    - Have implemented **Azure Landing Zones** as part of the cloud adoption framework, which includes the foundational infrastructure setup. This ensures:
      - **Identity Management**: Centralized identity management using Azure Active Directory (Azure AD).
      - **Network Topology and Connectivity**: Virtual Networks (VNets), Network Security Groups (NSGs), and private endpoints for resource isolation.
