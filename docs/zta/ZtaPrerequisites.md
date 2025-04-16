@@ -30,10 +30,6 @@ It is assumed that organizations have established below secure foundations in Az
      - Azure Blueprints for consistent resource deployment.
      - Azure Policy for compliance enforcement.
    - Reference: [Azure governance documentation | Microsoft Learn](https://learn.microsoft.com/en-us/azure/governance/)
-4. **Well-Architected Framework**:
-   - Have followed the **Azure Well-Architected Framework (WAF)** to ensure best practices for reliability, security, cost optimization, operational excellence, and performance efficiency.
-   - Have established best practices  and processes to implement the security pillar defined by Azure WAF: [Security design principles - Microsoft Azure Well-Architected Framework | Microsoft Learn](https://learn.microsoft.com/en-us/azure/well-architected/security/principles). The principles include zero trust model, and the security principles of **confidentiality**, **integrity**, and **availability**, also known as the *CIA Triad*.
-   - Reference: [Azure Well-Architected Framework](https://learn.microsoft.com/en-us/azure/well-architected/what-is-well-architected-framework)
 6. **Security Baseline**:
    - Have established a security baseline for Azure resources, including:
      - Enabling **Azure Security Center** (Microsoft Defender for Cloud).

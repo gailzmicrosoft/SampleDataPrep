@@ -34,6 +34,12 @@ Below is a brief summary of Cloud Adoption Framework (CAF), Well Architected Fra
 3. **Encrypt Everything**: Ensure encryption at rest and in transit for all data.
 4. **Monitor Continuously**: Use Azure Monitor, Defender, and Sentinel for real-time insights.
 5. **Automate Security Configurations**: Use Azure Policy and IaC to enforce security configurations.
+6. **Well-Architected Framework**:
+   *   Follow the **Azure Well-Architected Framework (WAF)** to ensure best practices for reliability, security, cost optimization, operational excellence, and performance efficiency.
+       
+   *   Establish best practices and processes to implement the security pillar defined by Azure WAF: [Security design principles - Microsoft Azure Well-Architected Framework | Microsoft Learn](https://learn.microsoft.com/en-us/azure/well-architected/security/principles). The principles include zero trust model, and the security principles of **confidentiality**, **integrity**, and **availability**, also known as the _CIA Triad_.
+       
+   *   Reference: [Azure Well-Architected Framework](https://learn.microsoft.com/en-us/azure/well-architected/what-is-well-architected-framework)
 
 ---
 
