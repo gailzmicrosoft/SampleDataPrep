@@ -1,4 +1,4 @@
-# Zero Trust Architecture Framework for Azure Applications
+# Zero Trust Framework for Azure Applications
 
 <Draft>
 
@@ -16,6 +16,16 @@ It is assumed that customer organizations have established foundations for devel
 1. **Verify Explicitly**: Always authenticate and authorize based on all available data points (e.g., user identity, location, device health, service identity).
 2. **Use Least Privilege Access**: Limit access to only what is necessary for users, applications, and services.
 3. **Assume Breach**: Design the architecture as if the network is already compromised.
+
+## Brief Summary of CAF, WAF, and ZT
+
+Below is a brief summary of Cloud Adoption Framework (CAF), Well Architected Framework (WAF), and Zero Trust (ZT) Security Principles. 
+
+| Name | Primary Focus                                                | Scope                                                        | Audience                                                     |
+| ---- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| CAF  | CAF focuses on the overall cloud adoption journey, including strategy, planning, and governance. | CAF covers a broad range of topics, including business alignment, governance, and operational management. | CAF targets business and IT leaders planning cloud adoption. |
+| WAF  | WAF is workload-centric, emphasizing the design and operation of cloud solutions. | WAF is narrower, focusing on technical architecture and workload optimization. | WAF is designed for architects and engineers designing cloud solutions. |
+| ZT   | Zero Trust is security-centric, focusing on protecting resources through continuous verification and least-privilege access. | Zero Trust is specific to security and access control.       | Zero Trust is relevant to security teams and IT administrators. |
 
 ## **Key Concepts for Implementation**
 
