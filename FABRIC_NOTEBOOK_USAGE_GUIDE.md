@@ -40,18 +40,92 @@ This guide provides step-by-step instructions for using the `Export_SalesLT_to_B
    - You should see the lakehouse name in the left panel
    - Ensure you can see the "Files" folder structure
 
-### Step 3: Verify Database Connection Settings
-1. **Check connection string (Cell 3)**
-   - The notebook uses: `Gaiye-SQL-DB.sql.fabric.microsoft.com`
-   - If your database has a different endpoint, update the connection string
-   - The notebook uses integrated authentication (recommended for Fabric)
+### Step 3: Handle Authentication Challenges
+⚠️ **Important**: Direct notebook authentication to Azure SQL has known limitations in Fabric
 
-2. **Test connection**
-   - Run Cell 3 to test the database connection
-   - Look for "✅ Database connection successful" message
-   - If connection fails, verify database name and permissions
+1. **Run Cell 3 (Authentication Test)**
+   - The notebook will test multiple authentication methods
+   - **If you have lakehouse shortcuts**: "✅ Found X existing SalesLT tables in lakehouse"
+   - **If no shortcuts**: Expected result: "⚠️ NO AUTHENTICATION METHOD WORKED"
+   - This is normal and expected based on community feedback
 
-### Step 4: Execute the Notebook
+2. **Choose Your Solution Path** (see options below):
+   - **Option A**: Create Lakehouse Shortcuts (Recommended - Easiest) ✅
+   - **Option B**: Use Data Factory Pipeline (Most Robust)
+   - **Option C**: Manual Workspace Identity Setup (Advanced)
+
+**Note**: Lakehouse shortcuts import SQL tables without the schema prefix. So `SalesLT.Customer` becomes just `Customer` in the lakehouse.
+
+### Step 4: Choose Your Authentication Solution
+
+Based on your test results, choose one of these approaches:
+
+#### 🎯 **OPTION A: Lakehouse Shortcuts (Recommended)**
+**Why this works**: No authentication issues, data appears as native tables
+
+**Steps**:
+1. **Go to your lakehouse**
+   - Navigate to your retail data model lakehouse
+   - Click on the "Tables" section in the left panel
+
+2. **Create shortcuts**
+   - Click "New shortcut" 
+   - Select "Azure SQL Database"
+   - **Server**: `gaiye-sql-db.sql.fabric.microsoft.com`
+   - **Database**: `Gaiye-SQL-DB`
+   - **Authentication**: Use workspace identity (automatic)
+
+3. **Select SalesLT tables**
+   - Browse to schema: `SalesLT`
+   - Select all tables (or specific ones you need)
+   - Click "Create"
+
+4. **Re-run the notebook**
+   - The notebook will automatically detect the shortcuts
+   - Cell 3 will show: "✅ Found X existing SalesLT tables in lakehouse"
+   - **Important**: Shortcuts appear as `Customer`, `Product`, etc. (no `SalesLT.` prefix)
+   - Continue with normal execution
+
+#### 🏭 **OPTION B: Data Factory Pipeline**
+**Why this works**: Your existing connections work perfectly in Data Factory
+
+**Steps**:
+1. **Create new Data Factory**
+   - In your workspace, click "New" → "Data Factory"
+   - Name it "SalesLT Export Pipeline"
+
+2. **Use existing connection**
+   - Create pipeline with connection: `gaiye-sql-db.sql.fabric.microsoft;SalesLT gazho`
+   - This connection already works in Data Factory
+
+3. **Create copy activities**
+   - Add "Copy Data" activity for each SalesLT table
+   - Source: SQL Server tables
+   - Destination: Lakehouse `Files/bronze/saleslt/`
+   - Format: Parquet
+
+4. **Schedule and run**
+   - Set up schedule for regular updates
+   - Manual trigger for immediate execution
+
+#### 🔧 **OPTION C: Manual Workspace Identity (Advanced)**
+**Warning**: Requires Azure admin permissions, mixed success rate
+
+**Steps**:
+1. **Get workspace identity name**
+   - In Fabric workspace settings, find the workspace identity
+   - Copy the full identity name
+
+2. **Azure Portal SQL Server setup**
+   - Go to Azure Portal → SQL Servers → gaiye-sql-db
+   - Navigate to "Security" → "Azure Active Directory"
+   - Add workspace identity as SQL admin or db_datareader
+
+3. **Test connection**
+   - Re-run Cell 3 in the notebook
+   - Look for successful workspace identity authentication
+
+### Step 5: Execute the Notebook (After Authentication Setup)
 
 #### Run Each Cell Sequentially:
 
@@ -62,38 +136,33 @@ This guide provides step-by-step instructions for using the `Export_SalesLT_to_B
 - Run to import required Python packages
 - Verify "✅ Libraries imported successfully" message
 
-**Cell 3 (Python)**: Database connection test
-- Tests connection to Gaiye-SQL-DB
-- Should show "✅ Database connection successful"
+**Cell 3 (Python)**: Authentication testing
+- Tests multiple authentication methods
+- If shortcuts created: "✅ Found existing SalesLT-related tables"
+- If no solution: Follow authentication setup guidance
 
 **Cell 4 (Python)**: Discover SalesLT tables
-- Automatically finds all tables in SalesLT schema
-- Lists discovered tables (typically includes Customer, Product, Order, etc.)
+- Automatically finds all tables based on your chosen authentication method
+- Lists discovered tables (Customer, Product, Orders, etc.)
 
 **Cell 5 (Python)**: Define export function
-- Sets up the table export logic
+- Sets up the table export logic with authentication awareness
 - Adds metadata tracking for each exported table
 
 **Cell 6 (Python)**: Execute bulk export
 - Exports all discovered tables to bronze layer
-- Shows progress for each table
+- Shows progress for each table with authentication method used
 - Displays success/failure status with row counts
 
-**Cell 7 (Python)**: Generate summary report
-- Creates detailed export summary
-- Shows total rows and file sizes
-- Saves summary JSON file
+**Cell 7 (Python)**: Troubleshooting and next steps
+- Provides guidance based on authentication results
+- Recommendations for production setup
 
 **Cell 8 (Python)**: Validation
 - Verifies files exist in bronze layer
 - Lists all exported files and directories
 
-**Cell 9 (Markdown)**: Next steps and troubleshooting
-- Read for post-export recommendations
-
-### Step 5: Verify Export Results
-
-#### Check Bronze Layer Structure:
+### Step 6: Verify Export Results
 ```
 Files/
 └── bronze/
@@ -145,30 +214,59 @@ Files/
 - `_extraction_timestamp`: When the data was exported
 - `_source_database`: Source database name ("Gaiye-SQL-DB")
 
+## Authentication Issues (Known Limitations)
+
+### Why Direct Notebook Authentication Fails
+Based on Microsoft Fabric community feedback:
+- **Workspace Identity vs User Token**: Fabric notebooks often get user tokens instead of workspace tokens
+- **JDBC Connector Issues**: `com.microsoft.sqlserver.jdbc.spark` format has known limitations in Fabric
+- **Token Scope Problems**: Azure SQL Database tokens may not work correctly from notebook context
+- **Authentication Mode Conflicts**: ActiveDirectoryMSI may not be properly configured
+
+### Community-Recommended Solutions (In Order of Preference)
+
+1. **Lakehouse Shortcuts** ✅ Most Reliable
+   - No authentication issues in notebooks
+   - Data appears as native lakehouse tables
+   - Automatic refresh capabilities
+   - Easiest to set up and maintain
+
+2. **Data Factory Pipelines** ✅ Most Robust
+   - Your existing connections work perfectly
+   - Better authentication handling
+   - Full ETL/ELT capabilities
+   - Production-ready scheduling
+
+3. **Workspace Identity Setup** ⚠️ Advanced/Mixed Results
+   - Requires Azure admin permissions
+   - Community reports inconsistent success
+   - Complex permission management
+
 ## Troubleshooting Common Issues
 
-### Connection Problems
-**Error**: "Connection failed"
+### Authentication Problems
+**Error**: "⚠️ NO AUTHENTICATION METHOD WORKED"
 **Solutions**:
-- Verify database name matches exactly: "Gaiye-SQL-DB"
-- Check workspace permissions for SQL database access
-- Ensure you're in the correct Fabric workspace
-- Try refreshing the notebook kernel
+- **Expected behavior** - This is a known limitation
+- Choose lakehouse shortcuts (recommended)
+- Use Data Factory instead of notebook
+- Contact Azure admin for workspace identity setup
 
-### Permission Issues
-**Error**: "Access denied to schema SalesLT"
+### Lakehouse Shortcuts Issues
+**Error**: "Cannot create shortcut to SQL Server"
 **Solutions**:
-- Contact workspace admin for SalesLT schema read permissions
-- Verify you have SQL database reader role
-- Check if database exists and is accessible in current workspace
+- Verify you have lakehouse contributor permissions
+- Check if SQL Server allows external connections
+- Ensure workspace identity has SQL Server access
+- Try creating shortcut to individual tables instead of schema
 
-### Lakehouse Issues
-**Error**: "Cannot write to Files/bronze"
+### Data Factory Connection Issues
+**Error**: "Connection test failed in Data Factory"
 **Solutions**:
-- Ensure lakehouse is properly attached to notebook
-- Verify write permissions to the lakehouse
-- Check if Files folder exists (create if missing)
-- Try running with a different lakehouse
+- Use the existing connection: `gaiye-sql-db.sql.fabric.microsoft;SalesLT gazho`
+- Don't create new connections - reuse existing ones
+- Verify the connection works in Data Factory first
+- Test with a simple copy activity on one table
 
 ### Large Table Handling
 **Error**: "Memory error" or "Timeout"

@@ -20,13 +20,24 @@ class FabricRetailDataPipeline:
         self.gold_data = {}
         
     # BRONZE LAYER - Raw data ingestion
-    def ingest_bronze_data(self, data_source_path):
-        """Load raw data into Bronze layer"""
+    def ingest_bronze_data(self, data_source_path=None, data_source_type='csv'):
+        """Load raw data into Bronze layer from various sources"""
         try:
-            # Load raw CSV files
-            self.bronze_data['customers'] = pd.read_csv(f"{data_source_path}/customers.csv")
-            self.bronze_data['products'] = pd.read_csv(f"{data_source_path}/products.csv")
-            self.bronze_data['orders'] = pd.read_csv(f"{data_source_path}/orders.csv")
+            if data_source_type == 'csv':
+                # Load raw CSV files
+                self.bronze_data['customers'] = pd.read_csv(f"{data_source_path}/customers.csv")
+                self.bronze_data['products'] = pd.read_csv(f"{data_source_path}/products.csv")
+                self.bronze_data['orders'] = pd.read_csv(f"{data_source_path}/orders.csv")
+            elif data_source_type == 'parquet':
+                # Load from Data Factory output (Parquet files)
+                self.bronze_data['customers'] = pd.read_parquet(f"{data_source_path}/customer/customer.parquet")
+                self.bronze_data['products'] = pd.read_parquet(f"{data_source_path}/product/product.parquet")
+                self.bronze_data['orders'] = pd.read_parquet(f"{data_source_path}/salesorderheader/salesorderheader.parquet")
+            elif data_source_type == 'fabric_bronze':
+                # Load from Fabric lakehouse bronze layer
+                self.bronze_data['customers'] = pd.read_parquet("Files/bronze/saleslt/customer/customer.parquet")
+                self.bronze_data['products'] = pd.read_parquet("Files/bronze/saleslt/product/product.parquet") 
+                self.bronze_data['orders'] = pd.read_parquet("Files/bronze/saleslt/salesorderheader/salesorderheader.parquet")
             
             # Add ingestion metadata
             ingestion_time = datetime.now().isoformat()
