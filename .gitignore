@@ -5,6 +5,7 @@
 
 # custom - Python
 **/.venv/
+**/venv/
 
 # User-specific files
 *.rsuser
