@@ -1,0 +1,1 @@
+OrderId,OrderNumber,CustomerId,CustomerAccountId,OrderDate,OrderStatus,OrderTotal,SubTotal,TaxAmount,ShippingAmount,DiscountAmount,PaymentMethod,ShippingAddress,BillingAddress,OrderNotes,CreatedTimestamp,UpdatedTimestamp,IsoCurrencyCode,StoreId,SalesChannelId,CreatedBy

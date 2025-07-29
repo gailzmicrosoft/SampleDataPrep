@@ -1,0 +1,1 @@
+CustomerId,CustomerTypeId,IsActive,CustomerNamePrefix,FirstName,LastName,MiddleName,Gender,DateOfBirth,PrimaryPhone,SecondaryPhone,PrimaryEmail,SecondaryEmail,CustomerEstablishedDate,CustomerRelationshipTypeId,CustomerNote,CreatedBy,UpdatedBy

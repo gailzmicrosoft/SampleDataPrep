@@ -13,7 +13,7 @@
 | Aspect                | Original Model        | Optimized Model     | Improvement                       |
 | --------------------- | --------------------- | ------------------- | --------------------------------- |
 | **Tables**            | 64 tables             | 14 tables           | **-78% complexity**               |
-| **Maintainability**   | Months to understand  | Days to understand  | **10x faster onboarding**        |
+| **Maintainability**   | Hours to understand | Minutes to understand | **faster onboarding**        |
 | **Development Speed** | Slow, complex queries | Fast, simple joins  | **5x development acceleration**   |
 | **Data Quality**      | High error potential  | Clean relationships | **Reduced data integrity issues** |
 | **Performance**       | Poor optimization     | Fabric-optimized    | **Lower compute costs**           |
@@ -22,12 +22,14 @@
 ### Examples of Original Model Problems
 
 **Ridiculous Fields Found:**
+
 - `DateOfDeath` - Are we selling to zombies?
 - `LocationElevation` - Do customers shop at different altitudes?
-- `EthnicCategoryId` & `RacialCategoryId` - Privacy/legal nightmare
+- `EthnicCategoryId` & `RacialCategoryId` - Privacy/legal nightmare. 
 - `CensusDivisionId` - Is this a store or census bureau?
 
 **Over-Engineering Examples:**
+
 - 6+ tables just for customer names (with prefix/suffix order numbers!)
 - 4 separate tables for gender management
 - 7 different location tables with overlapping purposes
@@ -88,8 +90,8 @@ UpdatedBy: "API:PaymentGateway"
 
 ### 2. Operational Excellence
 ```sql
--- Soft delete capability:
-IsActive BOOLEAN DEFAULT true  -- Customer and Location tables
+-- Track Active / Inactive Customer and Location 
+IsActive BOOLEAN  -- Customer and Location tables
 
 -- Flexible application numbering:
 CustomerAccountApplicationNumber STRING  -- Instead of INT
@@ -102,4 +104,3 @@ UpdatedBy STRING  -- Examples: SYSTEM.OrderProcessor, USER:sarah.jones,
                   -- API:PaymentGateway, BATCH:NightlyProcessor
 ```
 
-## Final Model Statistics
