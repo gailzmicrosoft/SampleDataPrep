@@ -1,4 +1,4 @@
-## Guidelines for sample street addresses and telephone numbers for sample data generation 
+## Guidelines for sample street addresses, telephone numbers, and emails for sample data generation 
 
 
 

@@ -20,7 +20,7 @@ Fields Instructions
 
 **DateOfBirth**: 
 
-1. Values: Age 18 to 105 at March 31, 2025
+1. Values: Age 18 to 105 as of March 31, 2025
 2. Distributions: 90 % between 18 and 75, 10% between 76-105 
 
 **CustomerEstablishedDate**:
